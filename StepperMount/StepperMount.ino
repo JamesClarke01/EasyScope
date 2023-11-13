@@ -1,41 +1,30 @@
 #include <Stepper.h>
 #include <SoftwareSerial.h>
-#include <Servo.h>;
  
-/*
-PINS
-Stepper:
-IN1: 11
-IN2: 10
-IN3: 9
-IN4: 8
+#define STEPS_PER_REV 2048
 
-Servo:
-pin 5
+//Pin Defines
+//Stepper
+#define STEP_IN1 11
+#define STEP_IN2 10
+#define STEP_IN3 9
+#define STEP_IN4 8
 
-HC-05
-RX: 6
-TX: 7
-*/
+//HC-05
+#define BT_RX 7
+#define BT_TX 6
 
-
-#define stepsPerRevolution 2048
-#define ALT_SERVO_PIN 5
- 
-Stepper stepper(stepsPerRevolution, 8, 10, 9, 11); 
-SoftwareSerial BTSerial(7, 6); //RX, TX
-Servo altServo;
+Stepper stepper(STEPS_PER_REV, STEP_IN4, STEP_IN2, STEP_IN3, STEP_IN1); 
+SoftwareSerial BTSerial(BT_RX, BT_TX); //RX, TX
  
 int direction = 1;
 int position = 0; //North
-int alt = 0;
 
 void setup()
 {
   Serial.begin(9600);
   BTSerial.begin(38400);
   stepper.setSpeed(10);
-  altServo.attach(ALT_SERVO_PIN);
 }
  
 void loop()
@@ -67,22 +56,6 @@ void loop()
         Serial.println("West");
         stepper.step((3 - position) * 512);
         position = 3;
-        break;
-      
-      case 'u':
-        Serial.println("Up");
-        if (alt+30 < 180) {
-          alt += 30;
-          altServo.write(alt);
-        }
-        break;
-
-      case 'd':
-        Serial.println("Down");
-        if (alt-30 > 0) {
-          alt -= 30;
-          altServo.write(alt);
-        } 
         break;
 
       default:
