@@ -1,11 +1,16 @@
 package com.james.telescopeapp
 
+import android.R.attr.button
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -21,10 +26,9 @@ class MainActivity : AppCompatActivity() {
 
     var btSocket: BluetoothSocket? = null;
 
-    fun btnConnectOnClick() {
+    fun bluetoothConnect() {
         val myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-        val myToast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT)
-        myToast.show()
+
 
         //Get bluetooth adapter
         val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
@@ -58,41 +62,172 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun writeToBT(data:String) {
+        if (btSocket != null) {
+            try { // Converting the string to bytes for transferring
+                btSocket!!.outputStream.write(data.toByteArray())
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.btnConnect).setOnClickListener {
-            btnConnectOnClick()
-        }
-
-        findViewById<Button>(R.id.btnNorth).setOnClickListener {
-            val myToast = Toast.makeText(this, "North!", Toast.LENGTH_SHORT)
+            val myToast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT)
             myToast.show()
 
+            bluetoothConnect()
+        }
+
+        findViewById<Button>(R.id.btnDisconnect).setOnClickListener {
+            val myToast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT)
             if (btSocket != null) {
-                try { // Converting the string to bytes for transferring
-                    btSocket!!.outputStream.write("n".toByteArray())
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+                btSocket?.close()
+                btSocket = null
             }
         }
 
-        findViewById<Button>(R.id.btnSouth).setOnClickListener {
-            val myToast = Toast.makeText(this, "South!", Toast.LENGTH_SHORT)
-            myToast.show()
+        //https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
+        findViewById<Button>(R.id.btnRight).setOnTouchListener(object: OnTouchListener {
+            private var mHandler: Handler? = null
 
-            if (btSocket != null) {
-                try { // Converting the string to bytes for transferring
-                    btSocket!!.outputStream.write("s".toByteArray())
-                } catch (e: IOException) {
-                    e.printStackTrace()
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if (mHandler == null) {
+                            mHandler = Handler()
+                            mHandler!!.post(mAction)  //assign recursive runnable
+                        } else {
+                            return true
+                        }
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        if (mHandler != null) {
+                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
+                            mHandler = null
+                        } else {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+
+            var mAction: Runnable = object : Runnable {
+                override fun run() {
+                    writeToBT("r")
+                    mHandler?.postDelayed(this, 500)
                 }
             }
-        }
-        Log.v(TAG, "Starting")
+        })
+
+        findViewById<Button>(R.id.btnLeft).setOnTouchListener(object: OnTouchListener {
+            private var mHandler: Handler? = null
+
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if (mHandler == null) {
+                            mHandler = Handler()
+                            mHandler!!.post(mAction)  //assign recursive runnable
+                        } else {
+                            return true
+                        }
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        if (mHandler != null) {
+                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
+                            mHandler = null
+                        } else {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+
+            var mAction: Runnable = object : Runnable {
+                override fun run() {
+                    writeToBT("l")
+                    mHandler?.postDelayed(this, 500)
+                }
+            }
+        })
+
+        findViewById<Button>(R.id.btnUp).setOnTouchListener(object: OnTouchListener {
+            private var mHandler: Handler? = null
+
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if (mHandler == null) {
+                            mHandler = Handler()
+                            mHandler!!.post(mAction)  //assign recursive runnable
+                        } else {
+                            return true
+                        }
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        if (mHandler != null) {
+                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
+                            mHandler = null
+                        } else {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+
+            var mAction: Runnable = object : Runnable {
+                override fun run() {
+                    writeToBT("u")
+                    mHandler?.postDelayed(this, 500)
+                }
+            }
+        })
+
+        findViewById<Button>(R.id.btnDown).setOnTouchListener(object: OnTouchListener {
+            private var mHandler: Handler? = null
+
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if (mHandler == null) {
+                            mHandler = Handler()
+                            mHandler!!.post(mAction)  //assign recursive runnable
+                        } else {
+                            return true
+                        }
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        if (mHandler != null) {
+                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
+                            mHandler = null
+                        } else {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+
+            var mAction: Runnable = object : Runnable {
+                override fun run() {
+                    writeToBT("d")
+                    mHandler?.postDelayed(this, 500)
+                }
+            }
+        })
 
 
 
