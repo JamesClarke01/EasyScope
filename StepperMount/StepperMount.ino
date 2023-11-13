@@ -15,7 +15,7 @@
 #define BT_TX 6
 
 Stepper stepper(STEPS_PER_REV, STEP_IN4, STEP_IN2, STEP_IN3, STEP_IN1); 
-SoftwareSerial BTSerial(BT_RX, BT_TX); //RX, TX
+SoftwareSerial BTSerial(BT_RX, BT_TX); 
  
 int direction = 1;
 int position = 0; //North
