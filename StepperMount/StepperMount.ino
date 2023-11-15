@@ -28,9 +28,56 @@ Stepper stepper(STEPS_PER_REV, STEP_IN4, STEP_IN2, STEP_IN3, STEP_IN1);
 Servo servo;
 SoftwareSerial BTSerial(BT_RX, BT_TX); 
 
+
+class DirectionClass {
+  private:
+    int alt;
+    int az;
+
+  public:
+
+    DirectionClass() {
+      setAlt(0);
+      setAz(0);
+    }
+
+    void setAlt(int pAlt) {
+      if (pAlt >= 0 && pAlt <= 90) {
+        alt = pAlt;
+        servo.write(map(alt, 0, 90, 80, 180));
+      }
+    }
+
+    void manualAltIncrease(void) {
+      setAlt(alt+SERVO_STEP);
+    }
+
+    void manualAltDecrease(void) {
+      setAlt(alt-SERVO_STEP);
+    }
+
+    void setAz(int pAz) {
+      stepper.step(map(pAz - az, 0, 360, 0, 2048));     
+      az = pAz;
+    }
+
+    manualAzIncrease(void) {
+      az += STEP_STEP;
+      stepper.step(STEP_STEP);  
+    }
+
+    manualAzDecrease(void) {
+      az -= STEP_STEP;
+      stepper.step(-STEP_STEP);  
+    }
+    
+    
+
+    
+};
+
 //Global Vars
-int alt;
-int az;
+DirectionClass direction;
 String altStr;
 String azStr;
 enum ReceiveMode receiveMode;
@@ -39,29 +86,6 @@ enum CoordType coordType;
 //Function Headers
 int handleManualChar(char input);
 int handleCoordChar(char input);
-int updateServo(void);
-int updateStepper(void);
-
-class Direction {
-  private:
-    int alt;
-    int az;
-
-    Direction() {
-      alt = 0;
-      az = 0;
-    }
-  
-  public:
-    void setAlt(int pAlt) {
-      alt = pAlt;
-    }
-    
-    void setAz(int pAz) {
-      alt = pAz;
-      
-    }
-};
 
 
 void setup()
@@ -76,11 +100,8 @@ void setup()
   stepper.setSpeed(STEP_STEP);
 
   //Servo Setup
-  alt = 0;
-  az = 0;
   servo.attach(SERVO_PIN);
-  updateServo();
-
+  
   //Flags
   receiveMode = MANUAL;
   coordType = ALT;
@@ -107,26 +128,19 @@ void loop()
 int handleManualChar(char input) {
   switch (input) {
     case 'r':  //Move Right
-      stepper.step(STEP_STEP);
+      direction.manualAzIncrease();
       break;
     case 'l':  //Move Left
-      stepper.step(-STEP_STEP);
+      direction.manualAzDecrease();
       break;          
-    /*
+    
     case 'u':  //Move Up
-      if (servoAngle + SERVO_STEP < 180) {
-        servoAngle += SERVO_STEP;
-        servo.write(servoAngle);
-      }
+      direction.manualAltIncrease();
       break;
     case 'd':  //Move Down
-      if (servoAngle - SERVO_STEP > 80) {
-        servoAngle -= SERVO_STEP;
-        Serial.println(servoAngle);
-        servo.write(servoAngle);
-      }
+      direction.manualAltDecrease();
       break;
-    */
+    
     case '(':  //Enter Coord Mode
       receiveMode = COORD;
       altStr = "";
@@ -139,10 +153,8 @@ int handleManualChar(char input) {
 int handleCoordChar(char input) {
   switch (input) {
     case ')':  //Switch to manual mode              
-      alt = altStr.toInt();
-      az = azStr.toInt();
-      updateServo();
-      updateStepper();
+      direction.setAlt(altStr.toInt());
+      direction.setAz(azStr.toInt());
       altStr = "";
       azStr = "";
       receiveMode = MANUAL;
@@ -163,11 +175,3 @@ int handleCoordChar(char input) {
 }
 
 
-int updateStepper(void) {
-  stepper.step(map(az, 0, 360, 0, 2048));
-
-}
- 
-int updateServo(void) {
-  servo.write(map(alt, 0, 90, 80, 180));
-}
