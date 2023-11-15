@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.IOException
@@ -75,6 +76,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val STREAM_RATE:Long = 15;
+
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.btnConnect).setOnClickListener {
@@ -91,6 +94,15 @@ class MainActivity : AppCompatActivity() {
                 btSocket = null
             }
         }
+
+        findViewById<Button>(R.id.btnMove).setOnClickListener {
+            val altitude = findViewById<EditText>(R.id.edtAltitude).text;
+            val azimuth = findViewById<EditText>(R.id.edtAzimuth).text;
+
+            writeToBT("(" + altitude + ',' + azimuth + ')');
+        }
+
+
 
         //https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
         findViewById<Button>(R.id.btnRight).setOnTouchListener(object: OnTouchListener {
@@ -122,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             var mAction: Runnable = object : Runnable {
                 override fun run() {
                     writeToBT("r")
-                    mHandler?.postDelayed(this, 500)
+                    mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
         })
@@ -156,7 +168,7 @@ class MainActivity : AppCompatActivity() {
             var mAction: Runnable = object : Runnable {
                 override fun run() {
                     writeToBT("l")
-                    mHandler?.postDelayed(this, 500)
+                    mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
         })
@@ -190,7 +202,7 @@ class MainActivity : AppCompatActivity() {
             var mAction: Runnable = object : Runnable {
                 override fun run() {
                     writeToBT("u")
-                    mHandler?.postDelayed(this, 500)
+                    mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
         })
@@ -224,7 +236,7 @@ class MainActivity : AppCompatActivity() {
             var mAction: Runnable = object : Runnable {
                 override fun run() {
                     writeToBT("d")
-                    mHandler?.postDelayed(this, 500)
+                    mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
         })
