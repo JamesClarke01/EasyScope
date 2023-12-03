@@ -1,19 +1,15 @@
 package com.james.telescopeapp
 
 import android.Manifest
-import android.R.attr.button
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
-import android.provider.Settings
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -23,8 +19,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.getSystemService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import io.github.cosinekitty.astronomy.Aberration
@@ -47,6 +41,8 @@ private val TAG = "DebugTag"
 
 private val REQUEST_LOCATION_PERMISSION = 0
 
+private var lattitude = 0.0
+private var longitude = 0.0
 
 class MainActivity : AppCompatActivity() {
 
@@ -134,7 +130,9 @@ class MainActivity : AppCompatActivity() {
             if(location==null) {
                 Toast.makeText(this, "Null Received", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, location.longitude.toString() + " " + location.latitude.toString(), Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, location.longitude.toString() + " " + location.latitude.toString(), Toast.LENGTH_SHORT).show()
+                lattitude = location.latitude
+                longitude = location.longitude
             }
         }
     }
@@ -173,7 +171,7 @@ class MainActivity : AppCompatActivity() {
 
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        getCurrentLocation()
+        //getCurrentLocation()
 
         findViewById<Button>(R.id.btnConnect).setOnClickListener {
             val myToast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT)
@@ -197,8 +195,7 @@ class MainActivity : AppCompatActivity() {
             writeToBT("(" + altitude + ',' + azimuth + ')');
         }
 
-        findViewById<Button>(R.id.btnPolaris).setOnClickListener {
-
+        fun pointAtStar(ra:Double, dec:Double) {
             //Get Time
             val currTime = Calendar.getInstance();
 
@@ -207,23 +204,34 @@ class MainActivity : AppCompatActivity() {
                 currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble());
 
 
+            getCurrentLocation()
+
+            val observer = Observer(lattitude, longitude, 0.0)
 
 
-
-            //val currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            /*
-            val observer = Observer(longitude, lattitude, 0.0)
-
-
-            defineStar(Body.Star1, 3.06, 89.36572, 1000.0)
+            defineStar(Body.Star1, ra, dec, 1000.0)
 
             val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)
 
             val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)
 
-            Log.d("TAG", ("%8.2f %8.2f".format(hor.azimuth, hor.altitude)));
-            */
 
+            Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT)
+
+            writeToBT("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')');
+
+        }
+
+        findViewById<Button>(R.id.btnPolaris).setOnClickListener {
+            pointAtStar(3.06, 89.36572)
+        }
+
+        findViewById<Button>(R.id.btnAld).setOnClickListener {
+            pointAtStar(18.616, 62.6903)
+        }
+
+        findViewById<Button>(R.id.btnCapella).setOnClickListener {
+            pointAtStar(5.3, 46.0217)
         }
 
 

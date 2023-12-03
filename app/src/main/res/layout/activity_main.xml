@@ -137,26 +137,39 @@
 
     <Button
         android:id="@+id/btnPolaris"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="141dp"
+        android:layout_height="46dp"
         android:layout_marginBottom="32dp"
         android:text="Polaris"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btnMove"
-        app:layout_constraintHorizontal_bias="0.263"
+        app:layout_constraintHorizontal_bias="0.24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtAzimuth"
         app:layout_constraintVertical_bias="1.0" />
 
-    <TextView
-        android:id="@+id/txtPolaris"
-        android:layout_width="123dp"
-        android:layout_height="63dp"
-        android:layout_marginEnd="76dp"
-        android:layout_marginBottom="52dp"
+    <Button
+        android:id="@+id/btnAld"
+        android:layout_width="135dp"
+        android:layout_height="46dp"
+        android:layout_marginBottom="16dp"
+        android:text="Alderamin"
         app:layout_constraintBottom_toTopOf="@+id/btnPolaris"
+        app:layout_constraintEnd_toStartOf="@+id/txtAzimuth"
+        app:layout_constraintHorizontal_bias="0.387"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnDown"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/btnCapella"
+        android:layout_width="139dp"
+        android:layout_height="46dp"
+        android:layout_marginBottom="20dp"
+        android:text="Capella"
+        app:layout_constraintBottom_toTopOf="@+id/btnAld"
         app:layout_constraintEnd_toStartOf="@+id/txtAltitude"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnDown"
         app:layout_constraintVertical_bias="1.0" />
