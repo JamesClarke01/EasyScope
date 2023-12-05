@@ -136,11 +136,11 @@
         app:layout_constraintTop_toBottomOf="@+id/edtAltitude" />
 
     <Button
-        android:id="@+id/btnPolaris"
-        android:layout_width="141dp"
-        android:layout_height="46dp"
+        android:id="@+id/btnStar3"
+        android:layout_width="140dp"
+        android:layout_height="42dp"
         android:layout_marginBottom="32dp"
-        android:text="Polaris"
+        android:text="Star 3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btnMove"
         app:layout_constraintHorizontal_bias="0.24"
@@ -149,12 +149,12 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/btnAld"
+        android:id="@+id/btnStar2"
         android:layout_width="135dp"
         android:layout_height="46dp"
         android:layout_marginBottom="16dp"
-        android:text="Alderamin"
-        app:layout_constraintBottom_toTopOf="@+id/btnPolaris"
+        android:text="Star 2"
+        app:layout_constraintBottom_toTopOf="@+id/btnStar3"
         app:layout_constraintEnd_toStartOf="@+id/txtAzimuth"
         app:layout_constraintHorizontal_bias="0.387"
         app:layout_constraintStart_toStartOf="parent"
@@ -162,12 +162,12 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/btnCapella"
+        android:id="@+id/btnStar1"
         android:layout_width="139dp"
         android:layout_height="46dp"
         android:layout_marginBottom="20dp"
-        android:text="Capella"
-        app:layout_constraintBottom_toTopOf="@+id/btnAld"
+        android:text="Star 1"
+        app:layout_constraintBottom_toTopOf="@+id/btnStar2"
         app:layout_constraintEnd_toStartOf="@+id/txtAltitude"
         app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"

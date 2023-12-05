@@ -222,16 +222,16 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        findViewById<Button>(R.id.btnPolaris).setOnClickListener {
-            pointAtStar(3.06, 89.36572)
+        findViewById<Button>(R.id.btnStar3).setOnClickListener {
+            pointAtStar(3.06, 89.36572) //Capella
         }
 
-        findViewById<Button>(R.id.btnAld).setOnClickListener {
-            pointAtStar(18.616, 62.6903)
+        findViewById<Button>(R.id.btnStar2).setOnClickListener {
+            pointAtStar(18.616, 62.6903)  //Alderamin
         }
 
-        findViewById<Button>(R.id.btnCapella).setOnClickListener {
-            pointAtStar(5.3, 46.0217)
+        findViewById<Button>(R.id.btnStar1).setOnClickListener {
+            pointAtStar(5.3, 46.0217)  //Polaris
         }
 
 
