@@ -203,22 +203,22 @@ class MainActivity : AppCompatActivity() {
                 currTime.get(Calendar.DATE),currTime.get(Calendar.HOUR_OF_DAY),
                 currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble());
 
+            //Get Location
+            getCurrentLocation()  
 
-            getCurrentLocation()
+            
+            val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
+            
+            defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
 
-            val observer = Observer(lattitude, longitude, 0.0)
+            val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
-
-            defineStar(Body.Star1, ra, dec, 1000.0)
-
-            val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)
-
-            val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)
+            val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
 
 
             Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT)
 
-            writeToBT("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')');
+            writeToBT("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')');  //send Bluetooth signal
 
         }
 
