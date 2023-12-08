@@ -206,7 +206,6 @@ class MainActivity : AppCompatActivity() {
             //Get Location
             getCurrentLocation()  
 
-            
             val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
             
             defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
@@ -214,7 +213,6 @@ class MainActivity : AppCompatActivity() {
             val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
             val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
-
 
             Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT)
 
