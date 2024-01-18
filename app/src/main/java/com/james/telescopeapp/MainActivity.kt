@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //getCurrentLocation()
 
-        findViewById<Button>(R.id.btnConnect).setOnClickListener {
+        findViewById<Button>(R.id.btnConnect1).setOnClickListener {
             val myToast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT)
             myToast.show()
 
@@ -221,16 +221,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnStar1).setOnClickListener {
-            pointAtStar(5.3, 46.0217)  //Capella
+            pointAtStar(21.318, 62.6903)  //Alderamin
         }
 
         findViewById<Button>(R.id.btnStar2).setOnClickListener {
-            pointAtStar(18.616, 62.6903)  //Alderamin
+            pointAtStar(3.06, 89.36572) //Polaris
         }
 
         findViewById<Button>(R.id.btnStar3).setOnClickListener {
-            pointAtStar(3.06, 89.36572) //Polaris
+            pointAtStar(5.3, 46.0217)  //Capella
         }
+
 
         //https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
         findViewById<Button>(R.id.btnRight).setOnTouchListener(object: OnTouchListener {

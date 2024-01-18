@@ -42,7 +42,7 @@
         app:layout_constraintVertical_bias="0.515" />
 
     <Button
-        android:id="@+id/btnConnect"
+        android:id="@+id/btnConnect1"
         android:layout_width="145dp"
         android:layout_height="45dp"
         android:layout_marginTop="28dp"
