@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         //Get bluetooth adapter
         val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
-        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.getAdapter()
+        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
         if (bluetoothAdapter == null) {
             // Device doesn't support Bluetooth
         }

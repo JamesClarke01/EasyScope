@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">TelescopeApp</string>
+    <string name="app_name">Easy Scope</string>
+    <string name="btnRefresh">Refresh</string>
+    <string name="connectScreenText">Select a device below to connect</string>
 </resources>
