@@ -42,27 +42,16 @@
         app:layout_constraintVertical_bias="0.515" />
 
     <Button
-        android:id="@+id/btnConnect1"
-        android:layout_width="145dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="28dp"
-        android:text="Connect"
-        app:layout_constraintBottom_toTopOf="@+id/btnDisconnect"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Header"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
         android:id="@+id/btnDisconnect"
         android:layout_width="145dp"
         android:layout_height="45dp"
         android:text="Disconnect"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.319"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.26" />
+        app:layout_constraintVertical_bias="0.976" />
 
     <Button
         android:id="@+id/btnUp"
@@ -151,13 +140,21 @@
         android:id="@+id/btnStar3"
         android:layout_width="130dp"
         android:layout_height="45dp"
-        android:layout_marginBottom="32dp"
         android:text="Star 3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnMove"
-        app:layout_constraintHorizontal_bias="0.24"
+        tools:layout_editor_absoluteX="43dp"
+        tools:layout_editor_absoluteY="620dp" />
+
+    <Button
+        android:id="@+id/btnStar1"
+        android:layout_width="130dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="20dp"
+        android:text="Star 1"
+        app:layout_constraintBottom_toTopOf="@+id/btnStar2"
+        app:layout_constraintEnd_toStartOf="@+id/txtAltitude"
+        app:layout_constraintHorizontal_bias="0.398"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtAzimuth"
+        app:layout_constraintTop_toBottomOf="@+id/btnDown"
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
@@ -169,19 +166,6 @@
         app:layout_constraintBottom_toTopOf="@+id/btnStar3"
         app:layout_constraintEnd_toStartOf="@+id/txtAzimuth"
         app:layout_constraintHorizontal_bias="0.398"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnDown"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <Button
-        android:id="@+id/btnStar1"
-        android:layout_width="130dp"
-        android:layout_height="45dp"
-        android:layout_marginBottom="20dp"
-        android:text="Star 1"
-        app:layout_constraintBottom_toTopOf="@+id/btnStar2"
-        app:layout_constraintEnd_toStartOf="@+id/txtAltitude"
-        app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnDown"
         app:layout_constraintVertical_bias="1.0" />

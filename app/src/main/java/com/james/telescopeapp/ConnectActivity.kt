@@ -6,10 +6,14 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -125,27 +129,29 @@ class ConnectActivity : AppCompatActivity() {
             false
         }
     }
+
+
+
     @SuppressLint("MissingPermission")
     private fun connectToDevice(device: BluetoothDevice) {
 
         if (checkBluetoothPermissions()) {
-            try {
-                if (bluetoothSocket == null) {
-                    val myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
-                    bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(myUUID)
+            val serviceIntent = Intent(this, BluetoothService::class.java)
+            serviceIntent.putExtra("device", device)
+            startService(serviceIntent)
 
-                    bluetoothAdapter?.cancelDiscovery() //cancel discovery or it will slow connection
+            bluetoothAdapter?.cancelDiscovery() //cancel discovery or it will slow connection
 
-                    bluetoothSocket?.connect()
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
 
+
+            //bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+            startConnectActivity()
         }
-
     }
 
-
+    private fun startConnectActivity() {
+        var mainIntent = Intent(this, CalibrateActivity::class.java)
+        startActivity(mainIntent);
+    }
 }

@@ -5,11 +5,16 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -37,63 +42,17 @@ import java.util.UUID
 import java.util.Calendar
 
 
-private val TAG = "DebugTag"
+private const val TAG = "DebugTag"
 
-private val REQUEST_LOCATION_PERMISSION = 0
+private const val REQUEST_LOCATION_PERMISSION = 0
 
 private var lattitude = 0.0
 private var longitude = 0.0
 
 class MainActivity : AppCompatActivity() {
 
-    var btSocket: BluetoothSocket? = null;
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient;
-
-    fun bluetoothConnect() {
-        val myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-
-
-        //Get bluetooth adapter
-        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
-        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
-        if (bluetoothAdapter == null) {
-            // Device doesn't support Bluetooth
-        }
-
-        //Will have to check if bluetooth is enabled here and ask user
-
-        //Connect to first device in paired devices (will have to add logic to select scope in future)
-
-        try {
-            if (btSocket == null) {
-                val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
-
-                val hc05 =
-                    bluetoothAdapter?.getRemoteDevice(pairedDevices?.firstOrNull().toString())
-
-                btSocket = hc05?.createInsecureRfcommSocketToServiceRecord(myUUID)
-                Log.v(TAG, "Created socket")
-
-                bluetoothAdapter?.cancelDiscovery() //cancel discovery or it will slow connection
-                Log.v(TAG, "Cancelled Discovery")
-
-                btSocket?.connect();
-                Log.v(TAG, "Connected to socket")
-            }
-        } catch (e: IOException ) {
-            e.printStackTrace()
-        }
-    }
-
-    fun writeToBT(data:String) {
-        if (btSocket != null) {
-            try { // Converting the string to bytes for transferring
-                btSocket!!.outputStream.write(data.toByteArray())
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
+    private lateinit var bluetoothService: MyServiceInterface
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     private fun checkLocationPermissions():Boolean {
         if (ActivityCompat.checkSelfPermission(
@@ -142,8 +101,6 @@ class MainActivity : AppCompatActivity() {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
-
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -161,38 +118,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun bindToBTService() {
+        //Overriding the serviceConnection so that bluetoothService variable can be set
+        val serviceConnection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                bluetoothService = (service as BluetoothService.MyBinder).also {
+                    // Service is connected, you can now call methods on the service
+                }
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+                //bluetoothService = null
+            }
+        }
+        val btServiceIntent = Intent(this, BluetoothService::class.java)
+        bindService(btServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val STREAM_RATE:Long = 15;
         setContentView(R.layout.activity_main)
 
+        val STREAM_RATE:Long = 15
 
+        bindToBTService()
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //getCurrentLocation()
 
-        findViewById<Button>(R.id.btnConnect1).setOnClickListener {
-            val myToast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT)
-            myToast.show()
-
-            bluetoothConnect()
-        }
-
-        findViewById<Button>(R.id.btnDisconnect).setOnClickListener {
-            val myToast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT)
-            if (btSocket != null) {
-                btSocket?.close()
-                btSocket = null
-            }
-        }
 
         findViewById<Button>(R.id.btnMove).setOnClickListener {
             val altitude = findViewById<EditText>(R.id.edtAltitude).text;
             val azimuth = findViewById<EditText>(R.id.edtAzimuth).text;
 
-            writeToBT("(" + altitude + ',' + azimuth + ')');
+            bluetoothService.write("(" + altitude + ',' + azimuth + ')');
         }
 
         fun pointAtStar(ra:Double, dec:Double) {
@@ -216,7 +175,7 @@ class MainActivity : AppCompatActivity() {
 
             Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT)
 
-            writeToBT("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')');  //send Bluetooth signal
+            bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')');  //send Bluetooth signal
 
         }
 
@@ -231,7 +190,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnStar3).setOnClickListener {
             pointAtStar(5.3, 46.0217)  //Capella
         }
-
 
         //https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
         findViewById<Button>(R.id.btnRight).setOnTouchListener(object: OnTouchListener {
@@ -262,7 +220,7 @@ class MainActivity : AppCompatActivity() {
 
             var mAction: Runnable = object : Runnable {
                 override fun run() {
-                    writeToBT("r")
+                    bluetoothService.write("r")
                     mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
@@ -296,7 +254,7 @@ class MainActivity : AppCompatActivity() {
 
             var mAction: Runnable = object : Runnable {
                 override fun run() {
-                    writeToBT("l")
+                    bluetoothService.write("l")
                     mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
@@ -330,7 +288,7 @@ class MainActivity : AppCompatActivity() {
 
             var mAction: Runnable = object : Runnable {
                 override fun run() {
-                    writeToBT("u")
+                    bluetoothService.write("u")
                     mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
@@ -364,13 +322,10 @@ class MainActivity : AppCompatActivity() {
 
             var mAction: Runnable = object : Runnable {
                 override fun run() {
-                    writeToBT("d")
+                    bluetoothService.write("d")
                     mHandler?.postDelayed(this, STREAM_RATE)
                 }
             }
         })
-
-
-
     }
 }
