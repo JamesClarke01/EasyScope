@@ -53,4 +53,10 @@ class BluetoothService : Service() {
     override fun onBind(intent: Intent): IBinder? {
         return binder
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bluetoothSocket!!.close()
+        bluetoothSocket = null
+    }
 }

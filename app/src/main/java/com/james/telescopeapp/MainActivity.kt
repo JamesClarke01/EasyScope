@@ -54,87 +54,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bluetoothService: MyServiceInterface
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    private fun checkLocationPermissions():Boolean {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED)
-        {
-            return true
-        }
-        return false
-    }
-
-    private fun requestLocationPermissions() {
-        ActivityCompat.requestPermissions(this,
-            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_LOCATION_PERMISSION
-        )
-    }
-
-    private fun getCurrentLocation() {
-
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestLocationPermissions()
-        }
-        fusedLocationProviderClient.lastLocation.addOnCompleteListener(this){ task->
-            val location:Location?=task.result
-            if(location==null) {
-                Toast.makeText(this, "Null Received", Toast.LENGTH_SHORT).show()
-            } else {
-                //Toast.makeText(this, location.longitude.toString() + " " + location.latitude.toString(), Toast.LENGTH_SHORT).show()
-                lattitude = location.latitude
-                longitude = location.longitude
-            }
-        }
-    }
-
-    private fun locationEnabled():Boolean {
-        val locationManager:LocationManager=getSystemService(LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if(requestCode == REQUEST_LOCATION_PERMISSION) {
-            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Location Permission Granted", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Location Permission Denied", Toast.LENGTH_SHORT).show()
-            }
-
-        }
-    }
-
-    private fun bindToBTService() {
-        //Overriding the serviceConnection so that bluetoothService variable can be set
-        val serviceConnection = object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                bluetoothService = (service as BluetoothService.MyBinder).also {
-                    // Service is connected, you can now call methods on the service
-                }
-            }
-
-            override fun onServiceDisconnected(name: ComponentName?) {
-                //bluetoothService = null
-            }
-        }
-        val btServiceIntent = Intent(this, BluetoothService::class.java)
-        bindService(btServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -146,27 +65,28 @@ class MainActivity : AppCompatActivity() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //getCurrentLocation()
 
+        findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
 
         findViewById<Button>(R.id.btnMove).setOnClickListener {
-            val altitude = findViewById<EditText>(R.id.edtAltitude).text;
-            val azimuth = findViewById<EditText>(R.id.edtAzimuth).text;
+            val altitude = findViewById<EditText>(R.id.edtAltitude).text
+            val azimuth = findViewById<EditText>(R.id.edtAzimuth).text
 
-            bluetoothService.write("(" + altitude + ',' + azimuth + ')');
+            bluetoothService.write("($altitude,$azimuth)")
         }
 
         fun pointAtStar(ra:Double, dec:Double) {
             //Get Time
-            val currTime = Calendar.getInstance();
+            val currTime = Calendar.getInstance()
 
             val time = Time(currTime.get(Calendar.YEAR),currTime.get(Calendar.MONTH),
                 currTime.get(Calendar.DATE),currTime.get(Calendar.HOUR_OF_DAY),
                 currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble());
 
             //Get Location
-            getCurrentLocation()  
+            getCurrentLocation()
 
             val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
-            
+
             defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
 
             val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
@@ -175,7 +95,7 @@ class MainActivity : AppCompatActivity() {
 
             Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT)
 
-            bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')');  //send Bluetooth signal
+            bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
 
         }
 
@@ -328,4 +248,97 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun disconnect() {
+        //Go back to first screen and end all activities on top of stack
+        intent = Intent(this, ConnectActivity::class.java)
+        intent.putExtra("disconnecting", true)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+    }
+
+    private fun checkLocationPermissions():Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED)
+        {
+            return true
+        }
+        return false
+    }
+
+    private fun requestLocationPermissions() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            REQUEST_LOCATION_PERMISSION
+        )
+    }
+
+    private fun getCurrentLocation() {
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermissions()
+        }
+        fusedLocationProviderClient.lastLocation.addOnCompleteListener(this){ task->
+            val location:Location?=task.result
+            if(location==null) {
+                Toast.makeText(this, "Null Received", Toast.LENGTH_SHORT).show()
+            } else {
+                //Toast.makeText(this, location.longitude.toString() + " " + location.latitude.toString(), Toast.LENGTH_SHORT).show()
+                lattitude = location.latitude
+                longitude = location.longitude
+            }
+        }
+    }
+
+    private fun locationEnabled():Boolean {
+        val locationManager:LocationManager=getSystemService(LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if(requestCode == REQUEST_LOCATION_PERMISSION) {
+            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Location Permission Granted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Location Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+    }
+
+    private fun bindToBTService() {
+        //Overriding the serviceConnection so that bluetoothService variable can be set
+        val serviceConnection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                bluetoothService = (service as BluetoothService.MyBinder).also {
+                    // Service is connected, you can now call methods on the service
+                }
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+                //bluetoothService = null
+            }
+        }
+        val btServiceIntent = Intent(this, BluetoothService::class.java)
+        bindService(btServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+
+
+
 }
