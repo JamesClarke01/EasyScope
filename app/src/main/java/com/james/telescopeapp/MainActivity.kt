@@ -1,10 +1,6 @@
 package com.james.telescopeapp
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothSocket
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -15,7 +11,6 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -37,12 +32,7 @@ import io.github.cosinekitty.astronomy.Topocentric
 import io.github.cosinekitty.astronomy.defineStar
 import io.github.cosinekitty.astronomy.equator
 import io.github.cosinekitty.astronomy.horizon
-import java.io.IOException
-import java.util.UUID
 import java.util.Calendar
-
-
-private const val TAG = "DebugTag"
 
 private const val REQUEST_LOCATION_PERMISSION = 0
 
@@ -67,11 +57,8 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
 
-        findViewById<Button>(R.id.btnMove).setOnClickListener {
-            val altitude = findViewById<EditText>(R.id.edtAltitude).text
-            val azimuth = findViewById<EditText>(R.id.edtAzimuth).text
-
-            bluetoothService.write("($altitude,$azimuth)")
+        findViewById<Button>(R.id.btnDebug).setOnClickListener{
+            openDebugActivity()
         }
 
         fun pointAtStar(ra:Double, dec:Double) {
@@ -80,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
             val time = Time(currTime.get(Calendar.YEAR),currTime.get(Calendar.MONTH),
                 currTime.get(Calendar.DATE),currTime.get(Calendar.HOUR_OF_DAY),
-                currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble());
+                currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble())
 
             //Get Location
             getCurrentLocation()
@@ -93,10 +80,9 @@ class MainActivity : AppCompatActivity() {
 
             val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
 
-            Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT)
+            Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
 
             bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
-
         }
 
         findViewById<Button>(R.id.btnStar1).setOnClickListener {
@@ -247,6 +233,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun openDebugActivity() {
+        val intent = Intent(this, DebugActivity::class.java)
+        startActivity(intent)
     }
 
     private fun disconnect() {

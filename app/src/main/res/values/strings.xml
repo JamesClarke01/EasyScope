@@ -1,5 +1,17 @@
 <resources>
+    <!--Main-->
     <string name="app_name">Easy Scope</string>
-    <string name="btnRefresh">Refresh</string>
+
+    <!--ConnectActivity-->
     <string name="connectScreenText">Select a device below to connect</string>
+    <string name="btnRefresh">Refresh</string>
+
+    <!--DebugActivity-->
+    <string name="txtDebugMain">Debug</string>
+    <string name="txtAltitude">Altitude:</string>
+    <string name="txtAzimuth">Azimuth:</string>
+    <string name="btnMove">Move</string>
+
+
+
 </resources>

@@ -22,10 +22,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TelescopeApp"
         tools:targetApi="31">
+        <activity
+            android:name=".DebugActivity"
+            android:exported="false" />
+
         <service
             android:name=".BluetoothService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity
             android:name=".CalibrateActivity"
