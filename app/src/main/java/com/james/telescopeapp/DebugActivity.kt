@@ -33,14 +33,10 @@ class DebugActivity : AppCompatActivity() {
         //Overriding the serviceConnection so that bluetoothService variable can be set
         val serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                bluetoothService = (service as BluetoothService.MyBinder).also {
-                    // Service is connected, you can now call methods on the service
-                }
+                bluetoothService = (service as BluetoothService.MyBinder)
             }
 
-            override fun onServiceDisconnected(name: ComponentName?) {
-                //bluetoothService = null
-            }
+            override fun onServiceDisconnected(name: ComponentName?) {}
         }
         val btServiceIntent = Intent(this, BluetoothService::class.java)
         bindService(btServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)

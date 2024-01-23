@@ -6,6 +6,10 @@
     <string name="connectScreenText">Select a device below to connect</string>
     <string name="btnRefresh">Refresh</string>
 
+    <!--MainActivity-->
+    <string name="btnSlew">Slew</string>
+    <string name="mainBtnCalibrate">Calibrate</string>
+
     <!--DebugActivity-->
     <string name="txtDebugMain">Debug</string>
     <string name="txtAltitude">Altitude:</string>

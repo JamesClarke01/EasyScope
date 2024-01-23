@@ -15,7 +15,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -85,16 +84,8 @@ class MainActivity : AppCompatActivity() {
             bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
         }
 
-        findViewById<Button>(R.id.btnStar1).setOnClickListener {
+        findViewById<Button>(R.id.btnSlew).setOnClickListener {
             pointAtStar(21.318, 62.6903)  //Alderamin
-        }
-
-        findViewById<Button>(R.id.btnStar2).setOnClickListener {
-            pointAtStar(3.06, 89.36572) //Polaris
-        }
-
-        findViewById<Button>(R.id.btnStar3).setOnClickListener {
-            pointAtStar(5.3, 46.0217)  //Capella
         }
 
         //https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
@@ -316,20 +307,14 @@ class MainActivity : AppCompatActivity() {
         //Overriding the serviceConnection so that bluetoothService variable can be set
         val serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                bluetoothService = (service as BluetoothService.MyBinder).also {
-                    // Service is connected, you can now call methods on the service
-                }
+                bluetoothService = (service as BluetoothService.MyBinder)
             }
 
-            override fun onServiceDisconnected(name: ComponentName?) {
-                //bluetoothService = null
-            }
+            override fun onServiceDisconnected(name: ComponentName?) {}
         }
         val btServiceIntent = Intent(this, BluetoothService::class.java)
         bindService(btServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
-
-
 
 
 }
