@@ -70,10 +70,6 @@ class DirectionClass {
       az -= STEP_STEP;
       stepper.step(-STEP_STEP);  
     }
-    
-    
-
-    
 };
 
 //Global Vars
