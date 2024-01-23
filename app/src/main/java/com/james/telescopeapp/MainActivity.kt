@@ -1,6 +1,7 @@
 package com.james.telescopeapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -43,187 +44,83 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bluetoothService: MyServiceInterface
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
+    inner class RepeatListener(direction: String) : OnTouchListener {
+        //Adapted from https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
+        private var mHandler: Handler? = null
+        private val streamRate:Long = 15
+        override fun onTouch(v: View, event: MotionEvent): Boolean {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (mHandler == null) {
+                        mHandler = Handler()
+                        mHandler!!.post(actionRunnable)  //assign recursive runnable
+                    } else {
+                        return true
+                    }
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    if (mHandler != null) {
+                        mHandler!!.removeCallbacks(actionRunnable)  //remove recursive runnable
+                        mHandler = null
+                    } else {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+
+        private var actionRunnable: Runnable = object : Runnable {
+            override fun run() {
+                bluetoothService.write(direction)
+                mHandler?.postDelayed(this, streamRate)
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val STREAM_RATE:Long = 15
-
         bindToBTService()
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        //getCurrentLocation()
 
         findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
+        findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
+        findViewById<Button>(R.id.btnSlew).setOnClickListener {pointAtStar(21.318, 62.6903)} //Alderamin
 
-        findViewById<Button>(R.id.btnDebug).setOnClickListener{
-            openDebugActivity()
-        }
+        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener("r"))
+        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener("l"))
+        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener("u"))
+        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener("d"))
 
-        fun pointAtStar(ra:Double, dec:Double) {
-            //Get Time
-            val currTime = Calendar.getInstance()
+    }
 
-            val time = Time(currTime.get(Calendar.YEAR),currTime.get(Calendar.MONTH),
-                currTime.get(Calendar.DATE),currTime.get(Calendar.HOUR_OF_DAY),
-                currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble())
+    private fun pointAtStar(ra:Double, dec:Double) {
+        //Get Time
+        val currTime = Calendar.getInstance()
 
-            //Get Location
-            getCurrentLocation()
+        val time = Time(currTime.get(Calendar.YEAR),currTime.get(Calendar.MONTH),
+            currTime.get(Calendar.DATE),currTime.get(Calendar.HOUR_OF_DAY),
+            currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble())
 
-            val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
+        //Get Location
+        getCurrentLocation()
 
-            defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
+        val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
 
-            val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
+        defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
 
-            val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
+        val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
-            Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
+        val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
 
-            bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
-        }
+        Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
 
-        findViewById<Button>(R.id.btnSlew).setOnClickListener {
-            pointAtStar(21.318, 62.6903)  //Alderamin
-        }
-
-        //https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
-        findViewById<Button>(R.id.btnRight).setOnTouchListener(object: OnTouchListener {
-            private var mHandler: Handler? = null
-
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        if (mHandler == null) {
-                            mHandler = Handler()
-                            mHandler!!.post(mAction)  //assign recursive runnable
-                        } else {
-                            return true
-                        }
-                    }
-
-                    MotionEvent.ACTION_UP -> {
-                        if (mHandler != null) {
-                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
-                            mHandler = null
-                        } else {
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-
-            var mAction: Runnable = object : Runnable {
-                override fun run() {
-                    bluetoothService.write("r")
-                    mHandler?.postDelayed(this, STREAM_RATE)
-                }
-            }
-        })
-
-        findViewById<Button>(R.id.btnLeft).setOnTouchListener(object: OnTouchListener {
-            private var mHandler: Handler? = null
-
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        if (mHandler == null) {
-                            mHandler = Handler()
-                            mHandler!!.post(mAction)  //assign recursive runnable
-                        } else {
-                            return true
-                        }
-                    }
-
-                    MotionEvent.ACTION_UP -> {
-                        if (mHandler != null) {
-                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
-                            mHandler = null
-                        } else {
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-
-            var mAction: Runnable = object : Runnable {
-                override fun run() {
-                    bluetoothService.write("l")
-                    mHandler?.postDelayed(this, STREAM_RATE)
-                }
-            }
-        })
-
-        findViewById<Button>(R.id.btnUp).setOnTouchListener(object: OnTouchListener {
-            private var mHandler: Handler? = null
-
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        if (mHandler == null) {
-                            mHandler = Handler()
-                            mHandler!!.post(mAction)  //assign recursive runnable
-                        } else {
-                            return true
-                        }
-                    }
-
-                    MotionEvent.ACTION_UP -> {
-                        if (mHandler != null) {
-                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
-                            mHandler = null
-                        } else {
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-
-            var mAction: Runnable = object : Runnable {
-                override fun run() {
-                    bluetoothService.write("u")
-                    mHandler?.postDelayed(this, STREAM_RATE)
-                }
-            }
-        })
-
-        findViewById<Button>(R.id.btnDown).setOnTouchListener(object: OnTouchListener {
-            private var mHandler: Handler? = null
-
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        if (mHandler == null) {
-                            mHandler = Handler()
-                            mHandler!!.post(mAction)  //assign recursive runnable
-                        } else {
-                            return true
-                        }
-                    }
-
-                    MotionEvent.ACTION_UP -> {
-                        if (mHandler != null) {
-                            mHandler!!.removeCallbacks(mAction)  //remove recursive runnable
-                            mHandler = null
-                        } else {
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-
-            var mAction: Runnable = object : Runnable {
-                override fun run() {
-                    bluetoothService.write("d")
-                    mHandler?.postDelayed(this, STREAM_RATE)
-                }
-            }
-        })
+        bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
     }
 
     private fun openDebugActivity() {
@@ -242,7 +139,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkLocationPermissions():Boolean {
         if (ActivityCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED)
         {
             return true
@@ -252,7 +149,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestLocationPermissions() {
         ActivityCompat.requestPermissions(this,
-            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             REQUEST_LOCATION_PERMISSION
         )
     }
