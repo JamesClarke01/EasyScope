@@ -1,3 +1,5 @@
+#include <Servo.h>
+
 #include <Stepper.h>
 #include <Servo.h>
 #include <SoftwareSerial.h>
@@ -12,10 +14,9 @@
 #define STEP_IN4 8
 
 //Servo
-#define SERVO_LEFT_PIN 5
-#define SERVO_RIGHT_PIN 4
+#define SERVO_LEFT_PIN 4
+#define SERVO_RIGHT_PIN 5
 #define SERVO_STEP 1
-#define SERVO_INCREMENT 10
 
 //HC-05
 #define BT_RX 7
@@ -39,50 +40,66 @@ class DirectionClass {
   public:
 
     DirectionClass() {
-      setAlt(0);
-      setAz(0);
+      //Both move methods require an initial value to be set before being called
+      alt = 0;
+      az = 0;
+      moveAlt(0);
+      moveAz(0);
+    }
+
+    void moveLeftServo(int pAlt) {
+      //for C577 servo
+      //left range: 90 -> 0
+      leftServo.write(map(pAlt, 0, 90, 90, 0));
+    }
+
+    void moveRightServo(int pAlt) {
+      //for C577 servo
+      //right range: 90 -> 180
+      rightServo.write(map(pAlt, 0, 90, 90, 180));
     }
 
     //Steppers
-    void setAlt(int pAlt) {
+    void moveAlt(int pAlt) {
       int leftAngle, rightAngle;
+      const int increment = 10;
 
-      if (pAlt >= 0 && pAlt <= 90) {
-        alt = pAlt;
+      if (pAlt >= 0 && pAlt <= 90) {                      
         
-        //servo.write(map(alt, 0, 90, 80, 180));
-
-        leftAngle = 0;
-        rightAngle = 180;
-
         //Move each servo in steps to keep the two in sync
-        for(int i = 0; i < alt / SERVO_INCREMENT; i++ ) {
-          leftAngle += SERVO_INCREMENT;
-          rightAngle -= SERVO_INCREMENT;
+        if (pAlt > alt) {
+                    
+          for(int i = increment; (alt + i) <= pAlt; i += increment) {                         
+            moveLeftServo(alt+i);
+            moveRightServo(alt+i);
+            delay(100);
+          }
+        } else if (pAlt < alt) {          
+          for(int i = increment; alt - i >= pAlt; i += increment) {
+            moveLeftServo(alt-i);
+            moveRightServo(alt-i);
+            delay(100);
+          } 
+        }
 
-          leftServo.write(leftAngle);
-          rightServo.write(rightAngle);
-          
-          delay(100);
-        }        
-        
         //Move the remainder
-        leftServo.write(alt);
-        rightServo.write(180 - alt);
-
+        moveLeftServo(pAlt);
+        moveRightServo(pAlt);
+        
+        alt = pAlt; //update current alt
       }
     }
 
     void manualAltIncrease(void) {
-      setAlt(alt+SERVO_STEP);
+      moveAlt(alt+SERVO_STEP);
     }
 
     void manualAltDecrease(void) {
-      setAlt(alt-SERVO_STEP);
+      moveAlt(alt-SERVO_STEP);
     }
 
     //Servos
-    void setAz(int pAz) {
+    void moveAz(int pAz) {
       stepper.step(map(pAz - az, 0, 360, 0, 2048));     
       az = pAz;
     }
@@ -109,7 +126,6 @@ enum CoordType coordType;
 int handleManualChar(char input);
 int handleCoordChar(char input);
 
-
 void setup()
 {
   //Serial Setup
@@ -122,6 +138,7 @@ void setup()
   stepper.setSpeed(STEP_STEP);
 
   //Servo Setup
+  
   leftServo.attach(SERVO_LEFT_PIN);
   rightServo.attach(SERVO_RIGHT_PIN);
   
@@ -176,8 +193,8 @@ int handleManualChar(char input) {
 int handleCoordChar(char input) {
   switch (input) {
     case ')':  //Switch to manual mode              
-      direction.setAlt(altStr.toInt());
-      direction.setAz(azStr.toInt());
+      direction.moveAlt(altStr.toInt());
+      direction.moveAz(azStr.toInt());
       altStr = "";
       azStr = "";
       receiveMode = MANUAL;
