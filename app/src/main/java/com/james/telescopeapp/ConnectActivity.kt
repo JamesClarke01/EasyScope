@@ -45,9 +45,9 @@ class ConnectActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
 
-        findViewById<Button>(R.id.btnRefresh).setOnClickListener {
-            listPairedDevices()
-        }
+        findViewById<Button>(R.id.btnRefresh).setOnClickListener {listPairedDevices()}
+        findViewById<Button>(R.id.btnDebug).setOnClickListener {openMain()}
+
         requestBluetoothPermissions()
         setupBluetooth()
         listPairedDevices()
@@ -62,6 +62,11 @@ class ConnectActivity : AppCompatActivity() {
 
         setupBluetooth()
         listPairedDevices()
+    }
+
+    private fun openMain() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     private fun setupBluetooth() {
@@ -161,7 +166,7 @@ class ConnectActivity : AppCompatActivity() {
     }
 
     private fun startConnectActivity() {
-        val mainIntent = Intent(this, CalibrateActivity::class.java)
-        startActivity(mainIntent)
+        val intent = Intent(this, CalibrateActivity::class.java)
+        startActivity(intent)
     }
 }

@@ -23,6 +23,11 @@
         android:theme="@style/Theme.TelescopeApp"
         tools:targetApi="31">
         <activity
+            android:name=".ObjectSelectActivity"
+            android:exported="false"
+            android:label="@string/title_activity_object_select"
+            android:theme="@style/Theme.TelescopeApp.NoActionBar" />
+        <activity
             android:name=".DebugActivity"
             android:exported="false" />
 
