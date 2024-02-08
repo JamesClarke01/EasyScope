@@ -27,5 +27,9 @@
     <string name="fragmentStar">Stars!</string>
     <string name="fragmentPlanet">Planets!</string>
     <string name="fragmentSatellite">Satellites!</string>
+    <!--star_item-->
+    <string name="starName">Name</string>
+    <string name="starRa">Right Ascension</string>
+    <string name="starDec">Declination</string>
 
 </resources>
