@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
         findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
-        findViewById<Button>(R.id.btnSlew).setOnClickListener {openDBTest()}
+        findViewById<Button>(R.id.btnSlew).setOnClickListener {openObjectSelect()}
 
         findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener("r"))
         findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener("l"))
