@@ -2,6 +2,7 @@ package com.james.telescopeapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,11 @@ class DBTestActivity : AppCompatActivity() {
 
         db = StarDBHelper(this)
         starAdapter = StarAdapter(db.getAllStars(), this)
+        starAdapter.setOnItemClickListener(object : StarAdapter.OnItemClickListener{
+            override fun onItemClick(star: Star) {
+                Log.d("DEBUG", star.name)
+            }
+        })
 
         binding.starRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.starRecyclerView.adapter = starAdapter

@@ -2,6 +2,7 @@ package com.james.telescopeapp
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
         findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
-        findViewById<Button>(R.id.btnSlew).setOnClickListener {openObjectSelect()}
+        findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
 
         findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener("r"))
         findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener("l"))
@@ -103,9 +105,21 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            val name = data?.getStringExtra("name")
+            trackStar(name!!)
+        }
+    }
+
     private fun openObjectSelect() {
         val intent = Intent(this, ObjectSelectActivity::class.java)
-        startActivity(intent)
+        resultLauncher.launch(intent)
+    }
+
+    private fun trackStar(name: String) {
+        findViewById<Button>(R.id.btnSlew).text = getString(R.string.btnTracking, name)
     }
 
     private fun pointAtStar(ra:Double, dec:Double) {

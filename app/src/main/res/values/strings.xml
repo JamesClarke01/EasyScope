@@ -9,6 +9,7 @@
 
     <!--MainActivity-->
     <string name="btnSlew">Slew</string>
+    <string name="btnTracking">Tracking %s</string>
     <string name="mainBtnCalibrate">Calibrate</string>
 
     <!--DebugActivity-->

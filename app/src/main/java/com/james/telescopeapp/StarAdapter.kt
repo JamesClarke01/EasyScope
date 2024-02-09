@@ -20,14 +20,32 @@ class StarAdapter(private var stars: List<Star>, context: Context): RecyclerView
         return StarViewHolder(view)
     }
 
-    override fun getItemCount(): Int = stars.size
-
     override fun onBindViewHolder(holder: StarViewHolder, position: Int) {
         val star = stars[position]
         holder.txtStarName.text = star.name
         holder.txtStarRa.text = star.ra.toString()
         holder.txtStarDec.text = star.dec.toString()
+
+        holder.itemView.setOnClickListener{
+            onItemClick(star)
+        }
     }
+
+    interface OnItemClickListener {
+        fun onItemClick(star:Star)
+    }
+
+    private var onItemClickListener: OnItemClickListener? = null
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        this.onItemClickListener = listener
+    }
+
+    private fun onItemClick(star: Star) {
+        onItemClickListener?.onItemClick(star)
+    }
+
+    override fun getItemCount(): Int = stars.size
 
     fun refreshData(newStars: List<Star>){
         stars = newStars
