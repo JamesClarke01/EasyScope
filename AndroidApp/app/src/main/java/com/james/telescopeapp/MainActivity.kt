@@ -118,13 +118,9 @@ class MainActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
-    private fun trackStar(name: String) {
+    private fun trackStar(name:String, ra:Double, dec:Double) {
         findViewById<Button>(R.id.btnSlew).text = getString(R.string.btnTracking, name)
-    }
 
-    private fun pointAtStar(ra:Double, dec:Double) {
-
-        //pointAtStar(21.318, 62.6903) (Alderamin)
         //Get Time
         val currTime = Calendar.getInstance()
 
