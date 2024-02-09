@@ -109,7 +109,12 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             val name = data?.getStringExtra("name")
-            trackStar(name!!)
+            val ra = data?.getDoubleExtra("ra", 0.0)
+            val dec = data?.getDoubleExtra("dec", 0.0)
+
+            if (name != null && ra != null && dec != null) {
+                trackStar(name, ra, dec)
+            }
         }
     }
 
