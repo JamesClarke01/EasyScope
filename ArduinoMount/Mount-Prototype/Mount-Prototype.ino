@@ -1,15 +1,16 @@
 #include <Stepper.h>
 #include <Servo.h>
 #include <SoftwareSerial.h>
+#include <ArduinoJson.h>
 
 //Stepper
 #define STEP_STEP 8
 #define STEP_SPEED 1
 #define STEPS_PER_REV 2048
-#define STEP_IN1 11
-#define STEP_IN2 10
-#define STEP_IN3 9
-#define STEP_IN4 8
+#define STEP_IN1 8
+#define STEP_IN2 9
+#define STEP_IN3 10
+#define STEP_IN4 11
 
 //Servo
 #define SERVO_PIN 5
@@ -24,7 +25,7 @@ enum ReceiveMode {MANUAL, COORD};
 enum CoordType {ALT, AZ};
 
 //Hardware components delcarations
-Stepper stepper(STEPS_PER_REV, STEP_IN4, STEP_IN2, STEP_IN3, STEP_IN1); 
+Stepper stepper(STEPS_PER_REV,STEP_IN1, STEP_IN3, STEP_IN2, STEP_IN4); 
 Servo servo;
 SoftwareSerial BTSerial(BT_RX, BT_TX); 
 
@@ -103,12 +104,41 @@ void setup()
   coordType = ALT;
 }
  
+String jsonString;
+int curlyCount = 0;
+
+
 void loop()
 {  
   if(BTSerial.available()) {
-    char input = BTSerial.read();
-    Serial.println(input);
+    char rChar = BTSerial.read();
 
+    //Receiving JSON String
+    if (rChar == '{' && curlyCount == 0) //Start of a JSON
+    {
+      curlyCount = 1;
+      jsonString = "{";
+    } 
+    else if (curlyCount > 0) //adding to JSON
+    {      
+      jsonString += rChar;
+      if(rChar == '{') 
+      {
+        curlyCount++;
+      } else if(rChar == '}') 
+      {
+        curlyCount--;
+        if(curlyCount == 0) { //Reached end of JSON
+          Serial.println(jsonString);       
+          
+          processJSON(jsonString);
+        }
+      } 
+    }
+    
+    //Serial.println(input);
+
+    /*
     switch (receiveMode) {
       case MANUAL:
         handleManualChar(input);
@@ -117,9 +147,44 @@ void loop()
         handleCoordChar(input);
         break;
     }
+    */
   }
   return 0;
 }
+
+
+void processJSON(String pJson) {
+  JsonDocument doc;
+  char* jsonArray = new char[pJson.length()+1];
+  strcpy(jsonArray, pJson.c_str()); 
+
+  DeserializationError error = deserializeJson(doc, jsonArray);
+
+  // Test if parsing succeeds.
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+
+  const char* instruction = doc["Instruction"];
+  
+  if(strcmp(instruction, "Slew") == 0) {    
+    JsonObject data = doc.createNestedObject("Data");
+
+    
+    double alt = data["Altitude"];
+    Serial.println(alt);
+    
+    //moveToCoords(doc["Data"]["Altitude"], doc["Data"]["Azimuth"]);
+  }
+}
+
+void moveToCoords(double alt, double az) {
+  //Serial.println(alt);
+}
+
+/*
 
 int handleManualChar(char input) {
   switch (input) {
@@ -169,5 +234,4 @@ int handleCoordChar(char input) {
       }
   }
 }
-
-
+*/

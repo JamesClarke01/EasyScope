@@ -34,6 +34,7 @@ import io.github.cosinekitty.astronomy.Topocentric
 import io.github.cosinekitty.astronomy.defineStar
 import io.github.cosinekitty.astronomy.equator
 import io.github.cosinekitty.astronomy.horizon
+import org.json.JSONObject
 import java.util.Calendar
 
 private const val REQUEST_LOCATION_PERMISSION = 0
@@ -146,7 +147,17 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
 
-        bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
+        val dataJson = JSONObject()
+        dataJson.put("azimuth", hor.azimuth)
+        dataJson.put("altitude", hor.altitude)
+
+        val instructionJson = JSONObject()
+        instructionJson.put("Instruction", "Slew")
+        instructionJson.put("Data", dataJson)
+
+        bluetoothService.write(instructionJson.toString())
+
+        //bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
     }
 
     private fun openDebugActivity() {
