@@ -13,7 +13,8 @@ import java.util.UUID
 
 interface MyServiceInterface {
     fun write(data: String)
-    fun moveCoord(alt: Double, az:Double)
+    fun slew(alt: Double, az:Double)
+    fun manual(direction: String)
 }
 
 class BluetoothService : Service() {
@@ -51,7 +52,7 @@ class BluetoothService : Service() {
             }
         }
 
-        override fun moveCoord(alt: Double, az: Double) {
+        override fun slew(alt: Double, az: Double) {
             val dataJson = JSONObject()
             dataJson.put("Altitude", alt)
             dataJson.put("Azimuth", az)
@@ -62,6 +63,18 @@ class BluetoothService : Service() {
 
             write(instructionJson.toString())
         }
+
+        override fun manual(direction: String) {
+            val dataJson = JSONObject()
+            dataJson.put("Direction", direction)
+
+            val instructionJson = JSONObject()
+            instructionJson.put("Instruction", "Manual")
+            instructionJson.put("Data", dataJson)
+
+            write(instructionJson.toString())
+        }
+
     }
 
     override fun onBind(intent: Intent): IBinder? {

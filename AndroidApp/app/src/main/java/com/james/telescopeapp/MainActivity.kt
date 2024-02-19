@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     inner class RepeatListener(direction: String) : OnTouchListener {
         //Adapted from https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
         private var mHandler: Handler? = null
-        private val streamRate:Long = 15
+        private val streamRate:Long = 200
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
         private var actionRunnable: Runnable = object : Runnable {
             override fun run() {
-                bluetoothService.write(direction)
+                bluetoothService.manual(direction)
                 mHandler?.postDelayed(this, streamRate)
             }
         }
@@ -95,10 +95,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
         findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
 
-        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener("r"))
-        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener("l"))
-        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener("u"))
-        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener("d"))
+        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener("Right"))
+        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener("Left"))
+        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener("Up"))
+        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener("Down"))
     }
 
     private fun openDBTest() {
@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
 
-        bluetoothService.moveCoord(hor.altitude, hor.azimuth)
+        bluetoothService.slew(hor.altitude, hor.azimuth)
     }
 
     private fun openDebugActivity() {

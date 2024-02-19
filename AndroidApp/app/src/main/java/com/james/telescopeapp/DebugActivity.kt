@@ -26,7 +26,7 @@ class DebugActivity : AppCompatActivity() {
         val altitude = findViewById<EditText>(R.id.edtAltitude).text.toString().toDouble()
         val azimuth = findViewById<EditText>(R.id.edtAzimuth).text.toString().toDouble()
 
-        bluetoothService.moveCoord(altitude, azimuth)
+        bluetoothService.slew(altitude, azimuth)
     }
 
     private fun bindToBTService() {

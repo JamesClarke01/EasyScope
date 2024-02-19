@@ -40,14 +40,16 @@ class DirectionClass {
       setAlt(0);
       setAz(0);
     }
-
+    
     void setAlt(int pAlt) {
       if (pAlt >= 0 && pAlt <= 90) {
         alt = pAlt;
+        Serial.println(map(alt, 0, 90, 80, 180));
         servo.write(map(alt, 0, 90, 80, 180));
       }
     }
-
+    
+    
     void manualAltIncrease(void) {
       setAlt(alt+SERVO_STEP);
     }
@@ -55,7 +57,7 @@ class DirectionClass {
     void manualAltDecrease(void) {
       setAlt(alt-SERVO_STEP);
     }
-
+    
     void setAz(int pAz) {
       stepper.step(map(pAz - az, 0, 360, 0, 2048));     
       az = pAz;
@@ -109,6 +111,7 @@ int curlyCount = 0;
 
 void loop()
 {  
+  
   if(BTSerial.available()) {
     char rChar = BTSerial.read();
 
@@ -128,30 +131,21 @@ void loop()
       {
         curlyCount--;
         if(curlyCount == 0) { //Reached end of JSON                  
+          //Serial.println(jsonString);
           processJSON(jsonString);
         }
       } 
     }
-    
-    //Serial.println(input);
-
-    /*
-    switch (receiveMode) {
-      case MANUAL:
-        handleManualChar(input);
-        break;
-      case COORD:
-        handleCoordChar(input);
-        break;
-    }
-    */
   }
   return 0;
 }
 
 
 void processJSON(String pJson) {
-  JsonDocument doc, dataDoc;
+  direction.manualAzIncrease();
+  delay(100);
+  
+  StaticJsonDocument<100> doc;
   char* jsonArray = new char[pJson.length()+1];
 
   strcpy(jsonArray, pJson.c_str()); 
@@ -167,65 +161,31 @@ void processJSON(String pJson) {
 
   const char* instruction = doc["Instruction"];
 
-  if(strcmp(instruction, "Slew") == 0) {                        
-    moveToCoords(doc["Data"]["Altitude"], doc["Data"]["Azimuth"]);
+  if(strcmp(instruction, "Slew") == 0) {     
+    Serial.println("Slew");              
+    slew(doc["Data"]["Altitude"], doc["Data"]["Azimuth"]);
+  } else if(strcmp(instruction, "Manual") == 0) {
+    Serial.println("Manual");
+    manual(doc["Data"]["Direction"]);
   }
+
+  delete[] jsonArray;
 }
 
-void moveToCoords(double alt, double az) {
-  Serial.println(alt);
-  Serial.println(az);
+void slew(double alt, double az) {
   direction.setAlt(alt);
   direction.setAz(az);
 }
 
-/*
-int handleManualChar(char input) {
-  switch (input) {
-    case 'r':  //Move Right
-      direction.manualAzIncrease();
-      break;
-    case 'l':  //Move Left
-      direction.manualAzDecrease();
-      break;          
-    
-    case 'u':  //Move Up
-      direction.manualAltIncrease();
-      break;
-    case 'd':  //Move Down
-      direction.manualAltDecrease();
-      break;
-    
-    case '(':  //Enter Coord Mode
-      receiveMode = COORD;
-      altStr = "";
-      azStr = "";
-      coordType = ALT;
-      break;
+void manual(String pDirection) {
+  Serial.println(pDirection);
+  if(pDirection == "Right") {    
+    direction.manualAzIncrease();
+  } else if(pDirection == "Left") {
+    direction.manualAzDecrease();
+  } else if(pDirection == "Up") {
+    direction.manualAltIncrease();
+  } else if(pDirection == "Down") {
+    direction.manualAltDecrease();
   }
 }
-
-int handleCoordChar(char input) {
-  switch (input) {
-    case ')':  //Switch to manual mode              
-      direction.setAlt(altStr.toInt());
-      direction.setAz(azStr.toInt());
-      altStr = "";
-      azStr = "";
-      receiveMode = MANUAL;
-      break;
-    case ',':  //Start taking for az value
-      coordType = AZ;
-      break;
-    default:
-      switch(coordType) {
-        case ALT:
-          altStr += input;
-          break;
-        case AZ: 
-          azStr += input;
-          break;
-      }
-  }
-}
-*/
