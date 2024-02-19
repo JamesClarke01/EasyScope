@@ -128,15 +128,13 @@ int handleManualChar(char input) {
       break;
     case 'l':  //Move Left
       direction.manualAzDecrease();
-      break;          
-    
+      break;              
     case 'u':  //Move Up
       direction.manualAltIncrease();
       break;
     case 'd':  //Move Down
       direction.manualAltDecrease();
-      break;
-    
+      break;    
     case '(':  //Enter Coord Mode
       receiveMode = COORD;
       altStr = "";
