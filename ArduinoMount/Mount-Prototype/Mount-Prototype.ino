@@ -29,7 +29,6 @@ Stepper stepper(STEPS_PER_REV,STEP_IN1, STEP_IN3, STEP_IN2, STEP_IN4);
 Servo servo;
 SoftwareSerial BTSerial(BT_RX, BT_TX); 
 
-
 class DirectionClass {
   private:
     int alt;
@@ -128,9 +127,7 @@ void loop()
       } else if(rChar == '}') 
       {
         curlyCount--;
-        if(curlyCount == 0) { //Reached end of JSON
-          Serial.println(jsonString);       
-          
+        if(curlyCount == 0) { //Reached end of JSON                  
           processJSON(jsonString);
         }
       } 
@@ -154,8 +151,9 @@ void loop()
 
 
 void processJSON(String pJson) {
-  JsonDocument doc;
+  JsonDocument doc, dataDoc;
   char* jsonArray = new char[pJson.length()+1];
+
   strcpy(jsonArray, pJson.c_str()); 
 
   DeserializationError error = deserializeJson(doc, jsonArray);
@@ -168,24 +166,20 @@ void processJSON(String pJson) {
   }
 
   const char* instruction = doc["Instruction"];
-  
-  if(strcmp(instruction, "Slew") == 0) {    
-    JsonObject data = doc.createNestedObject("Data");
 
-    
-    double alt = data["Altitude"];
-    Serial.println(alt);
-    
-    //moveToCoords(doc["Data"]["Altitude"], doc["Data"]["Azimuth"]);
+  if(strcmp(instruction, "Slew") == 0) {                        
+    moveToCoords(doc["Data"]["altitude"], doc["Data"]["azimuth"]);
   }
 }
 
 void moveToCoords(double alt, double az) {
   //Serial.println(alt);
+  //Serial.println(az);
+  direction.setAlt(alt);
+  direction.setAz(az);
 }
 
 /*
-
 int handleManualChar(char input) {
   switch (input) {
     case 'r':  //Move Right
