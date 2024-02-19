@@ -147,17 +147,7 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
 
-        val dataJson = JSONObject()
-        dataJson.put("Azimuth", hor.azimuth)
-        dataJson.put("Altitude", hor.altitude)
-
-        val instructionJson = JSONObject()
-        instructionJson.put("Instruction", "Slew")
-        instructionJson.put("Data", dataJson)
-
-        bluetoothService.write(instructionJson.toString())
-
-        //bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
+        bluetoothService.moveCoord(hor.altitude, hor.azimuth)
     }
 
     private fun openDebugActivity() {
