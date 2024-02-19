@@ -168,13 +168,13 @@ void processJSON(String pJson) {
   const char* instruction = doc["Instruction"];
 
   if(strcmp(instruction, "Slew") == 0) {                        
-    moveToCoords(doc["Data"]["altitude"], doc["Data"]["azimuth"]);
+    moveToCoords(doc["Data"]["Altitude"], doc["Data"]["Azimuth"]);
   }
 }
 
 void moveToCoords(double alt, double az) {
-  //Serial.println(alt);
-  //Serial.println(az);
+  Serial.println(alt);
+  Serial.println(az);
   direction.setAlt(alt);
   direction.setAz(az);
 }

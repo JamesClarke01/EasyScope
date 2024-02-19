@@ -148,8 +148,8 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
 
         val dataJson = JSONObject()
-        dataJson.put("azimuth", hor.azimuth)
-        dataJson.put("altitude", hor.altitude)
+        dataJson.put("Azimuth", hor.azimuth)
+        dataJson.put("Altitude", hor.altitude)
 
         val instructionJson = JSONObject()
         instructionJson.put("Instruction", "Slew")
