@@ -108,13 +108,8 @@ class MainActivity : AppCompatActivity() {
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
-            val name = data?.getStringExtra("name")
-            val ra = data?.getDoubleExtra("ra", 0.0)
-            val dec = data?.getDoubleExtra("dec", 0.0)
-
-            if (name != null && ra != null && dec != null) {
-                trackStar(name, ra, dec)
-            }
+            val body = data?.getSerializableExtra("Body") as Body
+            trackBody(body)
         }
     }
 
@@ -123,8 +118,8 @@ class MainActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
-    private fun trackStar(name:String, ra:Double, dec:Double) {
-        findViewById<Button>(R.id.btnSlew).text = getString(R.string.btnTracking, name)
+    private fun trackBody(pBody:Body) {
+        //findViewById<Button>(R.id.btnSlew).text = getString(R.string.btnTracking, name)
 
         //Get Time
         val currTime = Calendar.getInstance()
@@ -138,9 +133,9 @@ class MainActivity : AppCompatActivity() {
 
         val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
 
-        defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
+        //defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
 
-        val equ_ofdate: Equatorial = equator(Body.Star1, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
+        val equ_ofdate: Equatorial = equator(pBody, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
         val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
 

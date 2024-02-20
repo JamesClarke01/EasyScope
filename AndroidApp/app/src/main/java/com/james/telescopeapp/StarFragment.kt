@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.james.telescopeapp.databinding.FragmentStarBinding
+import io.github.cosinekitty.astronomy.Body
+import io.github.cosinekitty.astronomy.defineStar
 
 class StarFragment : Fragment() {
 
@@ -44,10 +46,9 @@ class StarFragment : Fragment() {
     fun selectStar(star:Star) {
         val resultIntent = Intent()
 
-        //Make the star class serializable if you want more data
-        resultIntent.putExtra("name", star.name)
-        resultIntent.putExtra("ra", star.ra)
-        resultIntent.putExtra("dec", star.dec)
+        defineStar(Body.Star1, star.ra, star.dec, 1000.0)  //define star (object in space)
+
+        resultIntent.putExtra("Body", Body.Star1)
 
         activity.setResult(Activity.RESULT_OK, resultIntent)
         Toast.makeText(activity, star.name + " selected", Toast.LENGTH_SHORT).show()
