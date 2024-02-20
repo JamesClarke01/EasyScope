@@ -1,8 +1,8 @@
 #include <SoftwareSerial.h>
 
 //HC-05
-#define BT_RX 7
-#define BT_TX 6
+#define BT_RX A0
+#define BT_TX A1
 
 SoftwareSerial BTSerial(BT_RX, BT_TX);
 
