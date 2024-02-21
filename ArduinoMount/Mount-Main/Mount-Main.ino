@@ -1,35 +1,32 @@
 #include <Servo.h>
 
-#include <Stepper.h>
 #include <Servo.h>
 #include <SoftwareSerial.h>
+#include <AFMotor.h>
 
 //Stepper
-#define STEP_STEP 8
-#define STEP_SPEED 1
 #define STEPS_PER_REV 2048
-#define STEP_IN1 11
-#define STEP_IN2 10
-#define STEP_IN3 9
-#define STEP_IN4 8
+#define STEPPER_PORT 2
+#define STEPPER_SPEED 20 //rpm
+#define MANUAL_STEPS 5
 
 //Servo
-#define SERVO_LEFT_PIN 4
-#define SERVO_RIGHT_PIN 5
+#define SERVO_LEFT_PIN 10
+#define SERVO_RIGHT_PIN 9
 #define SERVO_STEP 1
 
 //HC-05
-#define BT_RX 7
-#define BT_TX 6
+#define BT_RX 2
+#define BT_TX_UNUSED 0
 
 //Enums
 enum ReceiveMode {MANUAL, COORD};
 enum CoordType {ALT, AZ};
 
 //Hardware components delcarations
-Stepper stepper(STEPS_PER_REV, STEP_IN4, STEP_IN2, STEP_IN3, STEP_IN1); 
+AF_Stepper stepper(STEPS_PER_REV, STEPPER_PORT) ; 
 Servo leftServo, rightServo;
-SoftwareSerial BTSerial(BT_RX, BT_TX); 
+SoftwareSerial BTSerial(BT_RX, BT_TX_UNUSED); 
 
 
 class DirectionClass {
@@ -44,7 +41,7 @@ class DirectionClass {
       alt = 0;
       az = 0;
       moveAlt(0);
-      moveAz(0);
+      //moveAz(0);
     }
 
     void moveLeftServo(int pAlt) {
@@ -98,20 +95,21 @@ class DirectionClass {
       moveAlt(alt-SERVO_STEP);
     }
 
-    //Servos
+    /*
     void moveAz(int pAz) {
       stepper.step(map(pAz - az, 0, 360, 0, 2048));     
       az = pAz;
     }
+    */
 
     manualAzIncrease(void) {
-      az += STEP_STEP;
-      stepper.step(STEP_STEP);  
+      az += MANUAL_STEPS;
+      stepper.step(MANUAL_STEPS, FORWARD, INTERLEAVE);  
     }
 
     manualAzDecrease(void) {
-      az -= STEP_STEP;
-      stepper.step(-STEP_STEP);  
+      az -= MANUAL_STEPS;
+      stepper.step(MANUAL_STEPS, BACKWARD, INTERLEAVE);  
     }
 };
 
@@ -135,10 +133,9 @@ void setup()
   BTSerial.begin(38400);
 
   //Stepper Setup
-  stepper.setSpeed(STEP_STEP);
+  stepper.setSpeed(STEPPER_SPEED);
 
   //Servo Setup
-  
   leftServo.attach(SERVO_LEFT_PIN);
   rightServo.attach(SERVO_RIGHT_PIN);
   
@@ -194,7 +191,7 @@ int handleCoordChar(char input) {
   switch (input) {
     case ')':  //Switch to manual mode              
       direction.moveAlt(altStr.toInt());
-      direction.moveAz(azStr.toInt());
+      //direction.moveAz(azStr.toInt());
       altStr = "";
       azStr = "";
       receiveMode = MANUAL;

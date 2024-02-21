@@ -9,7 +9,6 @@
 
 int alt = 0;
 
-// Connect a stepper motor with 48 steps per revolution (7.5 degree)
 // to motor port #2 (M3 and M4)
 AF_Stepper motor(REV_STEPS, 2);
 Servo leftServo, rightServo;
@@ -62,8 +61,8 @@ void setup() {
 
   motor.setSpeed(10);  // 10 rpm   
 
-  leftServo.attach(9);
-  rightServo.attach(10);
+  leftServo.attach(10);
+  rightServo.attach(9);
 }
 
 void loop() {
@@ -85,8 +84,6 @@ void loop() {
   delay(1000);
   moveAlt(15);
   delay(1000);
-
-
 
   /*
   Serial.println("Interleave coil steps");
