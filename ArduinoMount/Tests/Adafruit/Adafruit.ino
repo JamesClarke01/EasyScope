@@ -65,7 +65,7 @@ void setup() {
   rightServo.attach(9);
 }
 
-void demo1() {
+void test1() {
   motor.step(REV_STEPS/2, FORWARD, INTERLEAVE); 
   delay(200);
   moveAlt(15);
@@ -85,16 +85,16 @@ void demo1() {
 }
 
 void fullRotation() {
-  motor.step(REV_STEPS, FORWARD, INTERLEAVE); 
+  motor.step(REV_STEPS*2, FORWARD, INTERLEAVE); 
   delay(1000);
-  motor.step(REV_STEPS, BACKWARD, INTERLEAVE); 
+  motor.step(REV_STEPS*2, BACKWARD, INTERLEAVE); 
   delay(1000);
 }
 
 void loop() {
 
-  fullRotation();  
-
+  //fullRotation();  
+  test1();
 
 
 

@@ -41,7 +41,7 @@ class DirectionClass {
       alt = 0;
       az = 0;
       moveAlt(0);
-      //moveAz(0);
+      moveAz(0);
     }
 
     void moveLeftServo(int pAlt) {
@@ -95,12 +95,12 @@ class DirectionClass {
       moveAlt(alt-SERVO_STEP);
     }
 
-    /*
+    
     void moveAz(int pAz) {
-      stepper.step(map(pAz - az, 0, 360, 0, 2048));     
+      stepper.step(map(pAz - az, 0, 360, 0, STEPS_PER_REV), FORWARD, INTERLEAVE);     
       az = pAz;
     }
-    */
+    
 
     manualAzIncrease(void) {
       az += MANUAL_STEPS;
@@ -191,7 +191,7 @@ int handleCoordChar(char input) {
   switch (input) {
     case ')':  //Switch to manual mode              
       direction.moveAlt(altStr.toInt());
-      //direction.moveAz(azStr.toInt());
+      direction.moveAz(azStr.toInt());
       altStr = "";
       azStr = "";
       receiveMode = MANUAL;
