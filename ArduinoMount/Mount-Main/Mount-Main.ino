@@ -5,7 +5,7 @@
 #include <AFMotor.h>
 
 //Stepper
-#define STEPS_PER_REV 2048
+#define STEPS_PER_REV 4096
 #define STEPPER_PORT 2
 #define STEPPER_SPEED 20 //rpm
 #define MANUAL_STEPS 5
@@ -19,12 +19,16 @@
 #define BT_RX 2
 #define BT_TX_UNUSED 0
 
+//Bounds
+#define ALT_LOW_BOUND 11
+#define ALT_HIGH_BOUND 90
+
 //Enums
 enum ReceiveMode {MANUAL, COORD};
 enum CoordType {ALT, AZ};
 
 //Hardware components delcarations
-AF_Stepper stepper(STEPS_PER_REV, STEPPER_PORT) ; 
+AF_Stepper stepper(STEPS_PER_REV/2, STEPPER_PORT) ; 
 Servo leftServo, rightServo;
 SoftwareSerial BTSerial(BT_RX, BT_TX_UNUSED); 
 
@@ -37,11 +41,13 @@ class DirectionClass {
   public:
 
     DirectionClass() {
-      //Both move methods require an initial value to be set before being called
-      alt = 0;
+      //Initialise values
+      alt = ALT_LOW_BOUND;
       az = 0;
-      moveAlt(0);
-      moveAz(0);
+
+      //Move to initial positions
+      moveToAlt(ALT_LOW_BOUND);
+      moveToAz(0);
     }
 
     void moveLeftServo(int pAlt) {
@@ -57,11 +63,11 @@ class DirectionClass {
     }
 
     //Steppers
-    void moveAlt(int pAlt) {
+    void moveToAlt(int pAlt) {
       int leftAngle, rightAngle;
       const int increment = 10;
 
-      if (pAlt >= 0 && pAlt <= 90) {                      
+      if (pAlt >= ALT_LOW_BOUND && pAlt <= ALT_HIGH_BOUND) {                      
         
         //Move each servo in steps to keep the two in sync
         if (pAlt > alt) {
@@ -88,20 +94,18 @@ class DirectionClass {
     }
 
     void manualAltIncrease(void) {
-      moveAlt(alt+SERVO_STEP);
+      moveToAlt(alt+SERVO_STEP);
     }
 
     void manualAltDecrease(void) {
-      moveAlt(alt-SERVO_STEP);
+      moveToAlt(alt-SERVO_STEP);
     }
 
-    
-    void moveAz(int pAz) {
-      stepper.step(map(pAz - az, 0, 360, 0, STEPS_PER_REV), FORWARD, INTERLEAVE);     
+    void moveToAz(int pAz) {      
+      stepper.step(map(pAz, 0, 360, 0, STEPS_PER_REV), FORWARD, INTERLEAVE);     
       az = pAz;
     }
     
-
     manualAzIncrease(void) {
       az += MANUAL_STEPS;
       stepper.step(MANUAL_STEPS, FORWARD, INTERLEAVE);  
@@ -143,41 +147,40 @@ void setup()
   receiveMode = MANUAL;
   coordType = ALT;
 }
- 
+
 void loop()
-{  
+{     
   if(BTSerial.available()) {
     char input = BTSerial.read();
     Serial.println(input);
-
     switch (receiveMode) {
+      
       case MANUAL:
         handleManualChar(input);
         break;
+      
       case COORD:
         handleCoordChar(input);
         break;
+      
     }
   }
-  return 0;
 }
 
 int handleManualChar(char input) {
-  switch (input) {
+  switch (input) {    
     case 'r':  //Move Right
       direction.manualAzIncrease();
       break;
     case 'l':  //Move Left
       direction.manualAzDecrease();
-      break;          
-    
+      break;                
     case 'u':  //Move Up
       direction.manualAltIncrease();
       break;
     case 'd':  //Move Down
       direction.manualAltDecrease();
       break;
-    
     case '(':  //Enter Coord Mode
       receiveMode = COORD;
       altStr = "";
@@ -190,8 +193,8 @@ int handleManualChar(char input) {
 int handleCoordChar(char input) {
   switch (input) {
     case ')':  //Switch to manual mode              
-      direction.moveAlt(altStr.toInt());
-      direction.moveAz(azStr.toInt());
+      direction.moveToAlt(altStr.toInt());
+      direction.moveToAz(azStr.toInt());
       altStr = "";
       azStr = "";
       receiveMode = MANUAL;
