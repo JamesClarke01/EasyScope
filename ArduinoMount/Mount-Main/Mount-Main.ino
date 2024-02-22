@@ -102,8 +102,24 @@ class DirectionClass {
     }
 
     void moveToAz(int pAz) {      
-      stepper.step(map(pAz, 0, 360, 0, STEPS_PER_REV), FORWARD, INTERLEAVE);     
+      
+      int direction;
+      int degToMove = pAz-az;
+      int stepsToMove;
+
+      if (degToMove < 0) {
+        direction = BACKWARD;
+      } else {
+        direction = FORWARD;
+      }
+
+      stepsToMove = map(abs(degToMove), 0, 360, 0, STEPS_PER_REV);
+
+      stepper.step(stepsToMove, direction, INTERLEAVE);
+      //Serial.println(degToMove);
+
       az = pAz;
+      
     }
     
     manualAzIncrease(void) {
@@ -152,7 +168,7 @@ void loop()
 {     
   if(BTSerial.available()) {
     char input = BTSerial.read();
-    Serial.println(input);
+    //Serial.println(input);
     switch (receiveMode) {
       
       case MANUAL:
@@ -161,8 +177,7 @@ void loop()
       
       case COORD:
         handleCoordChar(input);
-        break;
-      
+        break;      
     }
   }
 }
