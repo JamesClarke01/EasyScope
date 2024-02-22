@@ -87,7 +87,7 @@ void test1() {
 void fullRotation() {
   motor.step(REV_STEPS*2, FORWARD, INTERLEAVE); 
   delay(1000);
-  motor.step(REV_STEPS*2, FORWARD, BACKWARD); 
+  motor.step(REV_STEPS*2, BACKWARD, INTERLEAVE); 
   delay(1000);
 }
 
