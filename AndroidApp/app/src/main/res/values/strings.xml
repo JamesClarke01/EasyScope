@@ -26,7 +26,7 @@
     <string name="tabPlanet">Planets</string>
     <string name="tabSatellite">Satellites</string>
     <string name="fragmentStar">Stars!</string>
-    <string name="fragmentPlanet">Planets!</string>
+    <string name="fragmentPlanet">I know the moon\'s not a planet!</string>
     <string name="fragmentSatellite">Satellites!</string>
     <!--star_item-->
     <string name="starName">Name</string>
