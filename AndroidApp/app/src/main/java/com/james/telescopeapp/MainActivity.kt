@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bluetoothService: MyServiceInterface
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    inner class RepeatListener(direction: String) : OnTouchListener {
+    inner class RepeatListener(direction: Char) : OnTouchListener {
         //Adapted from https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
         private var mHandler: Handler? = null
         private val streamRate:Long = 15
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
         private var actionRunnable: Runnable = object : Runnable {
             override fun run() {
-                bluetoothService.write(direction)
+                bluetoothService.sendManualDirection(direction)
                 mHandler?.postDelayed(this, streamRate)
             }
         }
@@ -94,10 +94,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
         findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
 
-        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener("r"))
-        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener("l"))
-        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener("u"))
-        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener("d"))
+        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener('r'))
+        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener('l'))
+        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener('u'))
+        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener('d'))
     }
 
     private fun openDBTest() {
@@ -141,7 +141,8 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
 
-        bluetoothService.write("(" + hor.altitude.toString() + ',' +  hor.azimuth.toString() + ')')  //send Bluetooth signal
+        bluetoothService.sendSlewCoords(hor.altitude, hor.azimuth)
+
     }
 
     private fun openDebugActivity() {

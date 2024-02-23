@@ -12,6 +12,8 @@ import java.util.UUID
 
 interface MyServiceInterface {
     fun write(data: String)
+    fun sendSlewCoords(altitude: Double, azimuth: Double)
+    fun sendManualDirection(direction: Char)
 }
 
 class BluetoothService : Service() {
@@ -46,6 +48,16 @@ class BluetoothService : Service() {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
+            }
+        }
+
+        override fun sendSlewCoords(altitude: Double, azimuth: Double) {
+            write("(${altitude},${azimuth})")
+        }
+
+        override fun sendManualDirection(direction: Char) {
+            if(direction == 'l' || direction == 'r' || direction == 'u' || direction == 'd') {
+                write(direction.toString())
             }
         }
     }
