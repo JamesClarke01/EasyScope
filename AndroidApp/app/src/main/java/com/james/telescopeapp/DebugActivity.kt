@@ -23,10 +23,10 @@ class DebugActivity : AppCompatActivity() {
     }
 
     private fun moveScope() {
-        val altitude = findViewById<EditText>(R.id.edtAltitude).text
-        val azimuth = findViewById<EditText>(R.id.edtAzimuth).text
+        val altitude = findViewById<EditText>(R.id.edtAltitude).text.toString().toDouble()
+        val azimuth = findViewById<EditText>(R.id.edtAzimuth).text.toString().toDouble()
 
-        bluetoothService.write("($altitude,$azimuth)")
+        bluetoothService.sendSlewCoords(altitude, azimuth)
     }
 
     private fun bindToBTService() {
