@@ -36,12 +36,8 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         setupSensors()
 
 
-        findViewById<Button>(R.id.btnCalibrate).setOnClickListener {
-
-            calibrate()
-
-            //openMainActivity();
-        }
+        findViewById<Button>(R.id.btnCalibrate).setOnClickListener {calibrate()}
+        findViewById<Button>(R.id.btnToMain).setOnClickListener {openMainActivity()}
     }
 
     private fun setupSensors() {
@@ -58,6 +54,8 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
     private fun calibrate() {
         Log.d("SensorValues", "Accelerometer: ${accelerometerValues.joinToString()}")
         Log.d("SensorValues", "Magnetometer: ${magnetometerValues.joinToString()}")
+
+
         Toast.makeText(this, azimuth.toString(), Toast.LENGTH_SHORT).show()
     }
 
