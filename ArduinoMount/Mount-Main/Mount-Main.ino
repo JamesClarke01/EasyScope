@@ -1,35 +1,37 @@
 #include <Servo.h>
 
 #include <Stepper.h>
-#include <Servo.h>
+#include <AFMotor.h>
 #include <SoftwareSerial.h>
+#include <ArduinoJson.h>
 
 //Stepper
-#define STEP_STEP 8
-#define STEP_SPEED 1
-#define STEPS_PER_REV 2048
-#define STEP_IN1 11
-#define STEP_IN2 10
-#define STEP_IN3 9
-#define STEP_IN4 8
+#define STEPS_PER_REV 4096
+#define STEPPER_PORT 2
+#define STEPPER_SPEED 20 //rpm				  
+#define MANUAL_STEPS 5
 
 //Servo
-#define SERVO_LEFT_PIN 4
-#define SERVO_RIGHT_PIN 5
+#define SERVO_LEFT_PIN 10
+#define SERVO_RIGHT_PIN 9
 #define SERVO_STEP 1
 
 //HC-05
-#define BT_RX 7
-#define BT_TX 6
+#define BT_RX 2
+#define BT_TX_UNUSED 0
+
+//Bounds
+#define ALT_LOW_BOUND 11
+#define ALT_HIGH_BOUND 90
 
 //Enums
-enum ReceiveMode {MANUAL, COORD};
+//enum ReceiveMode {MANUAL, COORD};
 enum CoordType {ALT, AZ};
 
 //Hardware components delcarations
-Stepper stepper(STEPS_PER_REV, STEP_IN4, STEP_IN2, STEP_IN3, STEP_IN1); 
+AF_Stepper stepper(STEPS_PER_REV/2, STEPPER_PORT) ; 
 Servo leftServo, rightServo;
-SoftwareSerial BTSerial(BT_RX, BT_TX); 
+SoftwareSerial BTSerial(BT_RX, BT_TX_UNUSED); 
 
 
 class DirectionClass {
@@ -40,11 +42,13 @@ class DirectionClass {
   public:
 
     DirectionClass() {
-      //Both move methods require an initial value to be set before being called
-      alt = 0;
+      //Initialise values
+      alt = ALT_LOW_BOUND;
       az = 0;
-      moveAlt(0);
-      moveAz(0);
+
+      //Move to initial positions
+      moveToAlt(ALT_LOW_BOUND);
+      moveToAz(0);
     }
 
     void moveLeftServo(int pAlt) {
@@ -60,11 +64,11 @@ class DirectionClass {
     }
 
     //Steppers
-    void moveAlt(int pAlt) {
+    void moveToAlt(int pAlt) {
       int leftAngle, rightAngle;
       const int increment = 10;
 
-      if (pAlt >= 0 && pAlt <= 90) {                      
+      if (pAlt >= ALT_LOW_BOUND && pAlt <= ALT_HIGH_BOUND) {                    
         
         //Move each servo in steps to keep the two in sync
         if (pAlt > alt) {
@@ -91,27 +95,41 @@ class DirectionClass {
     }
 
     void manualAltIncrease(void) {
-      moveAlt(alt+SERVO_STEP);
+      moveToAlt(alt+SERVO_STEP);
     }
 
     void manualAltDecrease(void) {
-      moveAlt(alt-SERVO_STEP);
+      moveToAlt(alt-SERVO_STEP);
     }
 
     //Servos
-    void moveAz(int pAz) {
-      stepper.step(map(pAz - az, 0, 360, 0, 2048));     
+    void moveToAz(int pAz) {
+      int direction;
+      int degToMove = pAz-az;
+      int stepsToMove;
+
+      if (degToMove < 0) {
+        direction = BACKWARD;
+      } else {
+        direction = FORWARD;
+      }
+
+      stepsToMove = map(abs(degToMove), 0, 360, 0, STEPS_PER_REV);
+
+      stepper.step(stepsToMove, direction, INTERLEAVE);
+      //Serial.println(degToMove);
+
       az = pAz;
     }
 
     manualAzIncrease(void) {
-      az += STEP_STEP;
-      stepper.step(STEP_STEP);  
+      az += MANUAL_STEPS;
+      stepper.step(MANUAL_STEPS, FORWARD, INTERLEAVE);  
     }
 
     manualAzDecrease(void) {
-      az -= STEP_STEP;
-      stepper.step(-STEP_STEP);  
+      az -= MANUAL_STEPS;
+      stepper.step(MANUAL_STEPS, BACKWARD, INTERLEAVE);  
     }
 };
 
@@ -119,8 +137,10 @@ class DirectionClass {
 DirectionClass direction;
 String altStr;
 String azStr;
-enum ReceiveMode receiveMode;
+
 enum CoordType coordType;
+String jsonString;
+int curlyCount = 0;
 
 //Function Headers
 int handleManualChar(char input);
@@ -135,7 +155,7 @@ void setup()
   BTSerial.begin(38400);
 
   //Stepper Setup
-  stepper.setSpeed(STEP_STEP);
+  stepper.setSpeed(STEPPER_SPEED);
 
   //Servo Setup
   
@@ -143,16 +163,40 @@ void setup()
   rightServo.attach(SERVO_RIGHT_PIN);
   
   //Flags
-  receiveMode = MANUAL;
   coordType = ALT;
 }
  
 void loop()
 {  
   if(BTSerial.available()) {
-    char input = BTSerial.read();
-    Serial.println(input);
+    char rChar = BTSerial.read();
+    Serial.println(rChar);
 
+    //Receiving JSON String
+    if (rChar == '{' && curlyCount == 0) //Start of a JSON
+    {
+      curlyCount = 1;
+      jsonString = "{";
+    } 
+    else if (curlyCount > 0) //adding to JSON
+    {      
+      jsonString += rChar;
+      if(rChar == '{') 
+      {
+        curlyCount++;
+      } 
+      else if(rChar == '}') 
+      {
+        curlyCount--;
+        if(curlyCount == 0) { //Reached end of JSON                  
+          //Serial.println(jsonString);
+          processJSON(jsonString);
+        }
+      } 
+    }
+
+
+    /*
     switch (receiveMode) {
       case MANUAL:
         handleManualChar(input);
@@ -161,10 +205,12 @@ void loop()
         handleCoordChar(input);
         break;
     }
+    */
   }
   return 0;
 }
 
+/*
 int handleManualChar(char input) {
   switch (input) {
     case 'r':  //Move Right
@@ -189,7 +235,43 @@ int handleManualChar(char input) {
       break;
   }
 }
+*/
 
+void processJSON(String pJson) {
+ 
+  Serial.println("Processing JSON...");
+  StaticJsonDocument<100> doc;
+  char* jsonArray = new char[pJson.length()+1];  //allocate a new json array on the heap
+  
+  strcpy(jsonArray, pJson.c_str());  //Copy json string into json array
+
+  DeserializationError error = deserializeJson(doc, jsonArray);  //deserialize json
+
+  // Test if parsing succeeds.
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+
+  const char* instruction = doc["Instruction"];
+
+  if(strcmp(instruction, "Slew") == 0) {                 
+    slew(doc["Data"]["Altitude"], doc["Data"]["Azimuth"]);
+  }
+
+  delete[] jsonArray;  //Deallocate json array (important!)
+}
+
+void slew(double alt, double az) {
+  Serial.println("Slewing");     
+  direction.moveToAlt(alt);
+  direction.moveToAz(az);
+}
+
+
+
+/*
 int handleCoordChar(char input) {
   switch (input) {
     case ')':  //Switch to manual mode              
@@ -213,5 +295,6 @@ int handleCoordChar(char input) {
       }
   }
 }
+*/
 
 

@@ -23,10 +23,24 @@ class DebugActivity : AppCompatActivity() {
     }
 
     private fun moveScope() {
-        val altitude = findViewById<EditText>(R.id.edtAltitude).text.toString().toDouble()
-        val azimuth = findViewById<EditText>(R.id.edtAzimuth).text.toString().toDouble()
+        val altitudeStr = findViewById<EditText>(R.id.edtAltitude).text.toString()
+        val azimuthStr = findViewById<EditText>(R.id.edtAzimuth).text.toString()
+        val altitude: Double
+        val azimuth: Double
 
-        bluetoothService.slew(altitude, azimuth)
+        if(altitudeStr == "") {
+            altitude = 0.0
+        } else {
+            altitude = altitudeStr.toDouble()
+        }
+
+        if (azimuthStr == "") {
+            azimuth = 0.0
+        } else {
+            azimuth = azimuthStr.toDouble()
+        }
+
+        bluetoothService.sendSlewCoords(altitude, azimuth)
     }
 
     private fun bindToBTService() {
