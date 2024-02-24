@@ -14,6 +14,7 @@ interface MyServiceInterface {
     fun write(data: String)
     fun sendSlewCoords(altitude: Double, azimuth: Double)
     fun sendManualDirection(direction: Char)
+    fun sendCalibrationData(azimuth:Double)
 }
 
 class BluetoothService : Service() {
@@ -59,6 +60,10 @@ class BluetoothService : Service() {
             if(direction == 'l' || direction == 'r' || direction == 'u' || direction == 'd') {
                 write(direction.toString())
             }
+        }
+
+        override fun sendCalibrationData(azimuth: Double) {
+            
         }
     }
 
