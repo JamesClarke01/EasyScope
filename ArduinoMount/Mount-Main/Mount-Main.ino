@@ -130,6 +130,13 @@ class DirectionClass {
       az -= MANUAL_STEPS;
       stepper.step(MANUAL_STEPS, BACKWARD, INTERLEAVE);  
     }
+
+    void setAz(double pAz) {
+      az = pAz;
+      Serial.print("New Azimuth Value: ");
+      Serial.print(az);
+      Serial.print("\n");
+    }
 };
 
 //Global Vars
@@ -245,6 +252,10 @@ void processJSON(String pJson) {
 
   if(strcmp(instruction, "Slew") == 0) {                 
     slew(doc["Data"]["Altitude"], doc["Data"]["Azimuth"]);
+  } else if(strcmp(instruction, "Calibrate") == 0) {
+    calibrate(doc["Data"]["Azimuth"]);
+  } else if(strcmp(instruction, "Reset") == 0) {
+    reset();
   }
 
   delete[] jsonArray;  //Deallocate json array (important!)
@@ -256,4 +267,11 @@ void slew(double alt, double az) {
   direction.moveToAz(az);
 }
 
+void calibrate(double pAz) {
+  direction.setAz(pAz);
+}
+
+void reset() {
+  direction.moveToAlt(ALT_LOW_BOUND);
+}
 

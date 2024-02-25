@@ -18,6 +18,8 @@ interface MyServiceInterface {
 
     fun sendManualDirection(direction: Char)
     fun sendCalibrationData(azimuth:Double)
+
+    fun sendReset();
 }
 
 class BluetoothService : Service() {
@@ -74,7 +76,20 @@ class BluetoothService : Service() {
         }
 
         override fun sendCalibrationData(azimuth: Double) {
-            
+            val dataJson = JSONObject()
+            dataJson.put("Azimuth", azimuth)
+
+            val instructionJson = JSONObject()
+            instructionJson.put("Instruction", "Calibrate")
+            instructionJson.put("Data", dataJson)
+
+            write(instructionJson.toString())
+        }
+
+        override fun sendReset() {
+            val instructionJson = JSONObject()
+            instructionJson.put("Instruction", "Reset")
+            write(instructionJson.toString())
         }
     }
 
