@@ -94,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
         findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
         findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
+        findViewById<Button>(R.id.btnCalibrate).setOnClickListener{closeActivity()}
 
         findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener('r'))
         findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener('l'))
@@ -112,6 +113,10 @@ class MainActivity : AppCompatActivity() {
             val body = data?.getSerializableExtra("Body") as Body
             trackBody(body)
         }
+    }
+
+    private fun closeActivity() {
+        finish()
     }
 
     private fun openObjectSelect() {

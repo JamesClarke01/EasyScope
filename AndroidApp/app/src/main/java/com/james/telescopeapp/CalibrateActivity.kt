@@ -25,7 +25,7 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
     private val accelerometerValues = FloatArray(3)
     private val magnetometerValues = FloatArray(3)
 
-    private var azimuth: Float = 0.0F
+    private var azimuth: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +35,9 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
 
         setupSensors()
 
-
-        findViewById<Button>(R.id.btnCalibrate).setOnClickListener {calibrate()}
-        findViewById<Button>(R.id.btnToMain).setOnClickListener {openMainActivity()}
+        findViewById<Button>(R.id.btnCalibrate).setOnClickListener{calibrate()}
+        findViewById<Button>(R.id.btnReset).setOnClickListener{reset()}
+        findViewById<Button>(R.id.btnToMain).setOnClickListener{openMainActivity()}
     }
 
     private fun setupSensors() {
@@ -51,12 +51,16 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    private fun reset() {
+        bluetoothService?.sendReset()
+    }
+
     private fun calibrate() {
         Log.d("SensorValues", "Accelerometer: ${accelerometerValues.joinToString()}")
         Log.d("SensorValues", "Magnetometer: ${magnetometerValues.joinToString()}")
 
-
         Toast.makeText(this, azimuth.toString(), Toast.LENGTH_SHORT).show()
+        bluetoothService?.sendCalibrationData(azimuth)
     }
 
 
@@ -96,7 +100,7 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerValues, magnetometerValues)
         SensorManager.getOrientation(rotationMatrix, orientationValues)
 
-        azimuth = Math.toDegrees(orientationValues[0].toDouble()).toFloat()
+        azimuth = (Math.toDegrees(orientationValues[0].toDouble()) + 360) % 360  //returns value in range 0-360
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
