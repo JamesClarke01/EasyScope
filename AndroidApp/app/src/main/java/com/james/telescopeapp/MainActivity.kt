@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     inner class RepeatListener(direction: Char) : OnTouchListener {
         //Adapted from https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
         private var mHandler: Handler? = null
-        private val streamRate:Long = 200
+        private val streamRate:Long = 15
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {

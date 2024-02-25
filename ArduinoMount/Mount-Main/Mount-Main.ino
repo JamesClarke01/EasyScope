@@ -22,17 +22,16 @@
 
 //Bounds
 #define ALT_LOW_BOUND 11
-#define ALT_HIGH_BOUND 90
+#define ALT_HIGH_BOUND 84
 
 //Enums
-//enum ReceiveMode {MANUAL, COORD};
+enum ReceiveMode {MANUAL, JSON};
 enum CoordType {ALT, AZ};
 
 //Hardware components delcarations
 AF_Stepper stepper(STEPS_PER_REV/2, STEPPER_PORT) ; 
 Servo leftServo, rightServo;
 SoftwareSerial BTSerial(BT_RX, BT_TX_UNUSED); 
-
 
 class DirectionClass {
   private:
@@ -137,8 +136,10 @@ class DirectionClass {
 DirectionClass direction;
 String altStr;
 String azStr;
-
+enum ReceiveMode receiveMode;
 enum CoordType coordType;
+
+//JSON
 String jsonString;
 int curlyCount = 0;
 
@@ -157,12 +158,12 @@ void setup()
   //Stepper Setup
   stepper.setSpeed(STEPPER_SPEED);
 
-  //Servo Setup
-  
+  //Servo Setup  
   leftServo.attach(SERVO_LEFT_PIN);
   rightServo.attach(SERVO_RIGHT_PIN);
   
   //Flags
+  receiveMode = MANUAL;
   coordType = ALT;
 }
  
@@ -172,70 +173,56 @@ void loop()
     char rChar = BTSerial.read();
     Serial.println(rChar);
 
-    //Receiving JSON String
-    if (rChar == '{' && curlyCount == 0) //Start of a JSON
-    {
-      curlyCount = 1;
-      jsonString = "{";
-    } 
-    else if (curlyCount > 0) //adding to JSON
-    {      
-      jsonString += rChar;
-      if(rChar == '{') 
-      {
-        curlyCount++;
-      } 
-      else if(rChar == '}') 
-      {
-        curlyCount--;
-        if(curlyCount == 0) { //Reached end of JSON                  
-          //Serial.println(jsonString);
-          processJSON(jsonString);
-        }
-      } 
-    }
-
-
-    /*
-    switch (receiveMode) {
+    switch (receiveMode) {      
       case MANUAL:
-        handleManualChar(input);
+        handleManualChar(rChar);
         break;
-      case COORD:
-        handleCoordChar(input);
-        break;
-    }
-    */
+      case JSON:
+        handleJsonChar(rChar);
+        break;      
+    }    
   }
   return 0;
 }
 
-/*
-int handleManualChar(char input) {
-  switch (input) {
+int handleJsonChar(char rChar) {
+  //Receiving JSON String
+  
+  jsonString += rChar;
+  
+  if (rChar == '{') {
+    curlyCount++;
+  } else if (rChar == '}') {
+    curlyCount--;
+    if (curlyCount == 0) {  //reached end of json
+      receiveMode = MANUAL;
+      processJSON(jsonString);
+    }
+  }
+}
+
+int handleManualChar(char rChar) {
+  switch (rChar) {
     case 'r':  //Move Right
       direction.manualAzIncrease();
       break;
     case 'l':  //Move Left
       direction.manualAzDecrease();
-      break;          
-    
+      break;              
     case 'u':  //Move Up
       direction.manualAltIncrease();
       break;
     case 'd':  //Move Down
       direction.manualAltDecrease();
-      break;
-    
-    case '(':  //Enter Coord Mode
-      receiveMode = COORD;
-      altStr = "";
-      azStr = "";
-      coordType = ALT;
+      break;    
+    case '{':  //Enter json Mode
+      Serial.println("Entering JSON mode...");
+      curlyCount = 1;
+      jsonString = "{";
+      receiveMode = JSON;
       break;
   }
 }
-*/
 
 void processJSON(String pJson) {
  
@@ -268,33 +255,5 @@ void slew(double alt, double az) {
   direction.moveToAlt(alt);
   direction.moveToAz(az);
 }
-
-
-
-/*
-int handleCoordChar(char input) {
-  switch (input) {
-    case ')':  //Switch to manual mode              
-      direction.moveAlt(altStr.toInt());
-      direction.moveAz(azStr.toInt());
-      altStr = "";
-      azStr = "";
-      receiveMode = MANUAL;
-      break;
-    case ',':  //Start taking for az value
-      coordType = AZ;
-      break;
-    default:
-      switch(coordType) {
-        case ALT:
-          altStr += input;
-          break;
-        case AZ: 
-          azStr += input;
-          break;
-      }
-  }
-}
-*/
 
 
