@@ -95,7 +95,4 @@ void loop() {
 
   fullRotation();  
   //test1();
-
-
-
 }
