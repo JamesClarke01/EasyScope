@@ -7,12 +7,15 @@ import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import org.json.JSONObject
 import java.io.IOException
 import java.util.UUID
 
 interface MyServiceInterface {
     fun write(data: String)
+
     fun sendSlewCoords(altitude: Double, azimuth: Double)
+
     fun sendManualDirection(direction: Char)
     fun sendCalibrationData(azimuth:Double)
 }
@@ -53,7 +56,15 @@ class BluetoothService : Service() {
         }
 
         override fun sendSlewCoords(altitude: Double, azimuth: Double) {
-            write("(${altitude},${azimuth})")
+            val dataJson = JSONObject()
+            dataJson.put("Altitude", altitude)
+            dataJson.put("Azimuth", azimuth)
+
+            val instructionJson = JSONObject()
+            instructionJson.put("Instruction", "Slew")
+            instructionJson.put("Data", dataJson)
+
+            write(instructionJson.toString())
         }
 
         override fun sendManualDirection(direction: Char) {
