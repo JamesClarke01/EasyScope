@@ -4,13 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".ConnectActivity">
 
     <TextView
         android:id="@+id/txtConnectScreen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/spaceranger"
         android:text="@string/connectScreenText"
+        android:textAlignment="center"
+        android:textColor="@color/foreground"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.485"
@@ -21,8 +26,8 @@
     <ListView
         android:id="@+id/lstDevice"
         android:layout_width="200dp"
-
         android:layout_height="100dp"
+
         app:layout_constraintBaseline_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,6 +41,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btnRefresh"
+        android:textColor="@color/foreground"
+        android:background="@drawable/button_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,6 +54,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btnDebugConnect"
+        android:textColor="@color/foreground"
+        android:background="@drawable/button_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.157"

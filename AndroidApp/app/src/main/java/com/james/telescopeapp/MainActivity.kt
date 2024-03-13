@@ -125,8 +125,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun trackBody(pBody:Body) {
-        //findViewById<Button>(R.id.btnSlew).text = getString(R.string.btnTracking, name)
-
         //Get Time
         val currTime = Calendar.getInstance()
 
@@ -138,8 +136,6 @@ class MainActivity : AppCompatActivity() {
         getCurrentLocation()
 
         val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
-
-        //defineStar(Body.Star1, ra, dec, 1000.0)  //define star (object in space)
 
         val equ_ofdate: Equatorial = equator(pBody, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
@@ -198,7 +194,6 @@ class MainActivity : AppCompatActivity() {
             if(location==null) {
                 Toast.makeText(this, "Null Received", Toast.LENGTH_SHORT).show()
             } else {
-                //Toast.makeText(this, location.longitude.toString() + " " + location.latitude.toString(), Toast.LENGTH_SHORT).show()
                 lattitude = location.latitude
                 longitude = location.longitude
             }
