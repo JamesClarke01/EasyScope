@@ -45,7 +45,7 @@ private const val REQUEST_LOCATION_PERMISSION = 0
 private var lattitude = 0.0
 private var longitude = 0.0
 
-private var trackingBody:Body? = null
+//private var trackingBody:Body? = null
 private val trackTimer = Timer()
 
 private val DEBUG_TAG = "DEBUG"
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     inner class RepeatListener(direction: Char) : OnTouchListener {
-        //Adapted from https://stackoverflow.com/questions/10511423/android-repeat-action-on-pressing-and-holding-a-button
+
         private var mHandler: Handler? = null
         private val streamRate:Long = 15
         override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -115,22 +115,25 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private val timerTrackTask = object : TimerTask() {
-        override fun run() {
-            Log.d("TIMER", "timer")
-            if (trackingBody != null) {
-                trackBody();
+    private var timerTrackTask: TimerTask? = null
+
+    private fun startTrack(pBody: Body) {
+        timerTrackTask?.cancel()  //cancel currently running task if it exists
+
+        timerTrackTask = object : TimerTask() {
+            override fun run() {
+                trackBody(pBody)
             }
         }
+
+        trackTimer.schedule(timerTrackTask, 0, 10000)
     }
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             val body = data?.getSerializableExtra("Body") as Body
-            trackingBody = body
-
-            trackTimer.schedule(timerTrackTask, 0, 10000)
+            startTrack(body)
         }
     }
 
@@ -143,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
-    private fun trackBody() {
+    private fun trackBody(pBody: Body) {
         //Get Time
         val currTime = Calendar.getInstance()
 
@@ -156,7 +159,7 @@ class MainActivity : AppCompatActivity() {
 
         val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
 
-        val equ_ofdate: Equatorial = equator(trackingBody!!, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
+        val equ_ofdate: Equatorial = equator(pBody!!, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
         val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
 
