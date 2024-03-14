@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/button_selector"/>
+
+    <item>
+        <shape android:shape="rectangle">
+            <!-- Background color of the button -->
+            <solid android:color="@android:color/transparent" />
+            <!-- Border color and width -->
+            <stroke
+                android:width="2dp"
+                android:color="@color/foreground" />
+            <!-- Corner radius of the button -->
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</layer-list>
