@@ -32,12 +32,16 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         setContentView(R.layout.activity_calibrate)
 
         bindToBTService()
-
+        reset()
         setupSensors()
 
         findViewById<Button>(R.id.btnCalibrate).setOnClickListener{calibrate()}
-        findViewById<Button>(R.id.btnReset).setOnClickListener{reset()}
         findViewById<Button>(R.id.btnToMain).setOnClickListener{openMainActivity()}
+    }
+
+    override fun onResume() {
+        super.onResume()
+        reset()
     }
 
     private fun setupSensors() {

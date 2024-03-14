@@ -23,6 +23,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.296" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/spaceranger"
+        android:text="Easy-Scope"
+        android:textColor="@color/foreground"
+        android:textSize="50sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.122" />
+
     <ListView
         android:id="@+id/lstDevice"
         android:layout_width="200dp"
@@ -49,18 +63,6 @@
         app:layout_constraintTop_toBottomOf="@+id/txtConnectScreen"
         app:layout_constraintVertical_bias="0.439" />
 
-    <Button
-        android:id="@+id/btnDebug"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btnDebugConnect"
-        android:textColor="@color/foreground"
-        android:background="@drawable/button_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.157"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.105" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

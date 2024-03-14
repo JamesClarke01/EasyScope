@@ -46,7 +46,6 @@ class ConnectActivity : AppCompatActivity() {
         setContentView(R.layout.activity_connect)
 
         findViewById<Button>(R.id.btnRefresh).setOnClickListener {listPairedDevices()}
-        findViewById<Button>(R.id.btnDebug).setOnClickListener {openMain()}
 
         requestBluetoothPermissions()
         setupBluetooth()
@@ -62,11 +61,6 @@ class ConnectActivity : AppCompatActivity() {
 
         setupBluetooth()
         listPairedDevices()
-    }
-
-    private fun openMain() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
     }
 
     private fun setupBluetooth() {
