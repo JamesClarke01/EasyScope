@@ -13,6 +13,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -36,11 +37,18 @@ import io.github.cosinekitty.astronomy.equator
 import io.github.cosinekitty.astronomy.horizon
 import org.json.JSONObject
 import java.util.Calendar
+import java.util.Timer
+import java.util.TimerTask
 
 private const val REQUEST_LOCATION_PERMISSION = 0
 
 private var lattitude = 0.0
 private var longitude = 0.0
+
+private var trackingBody:Body? = null
+private val trackTimer = Timer()
+
+private val DEBUG_TAG = "DEBUG"
 
 class MainActivity : AppCompatActivity() {
 
@@ -107,11 +115,22 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private val timerTrackTask = object : TimerTask() {
+        override fun run() {
+            Log.d("TIMER", "timer")
+            if (trackingBody != null) {
+                trackBody();
+            }
+        }
+    }
+
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             val body = data?.getSerializableExtra("Body") as Body
-            trackBody(body)
+            trackingBody = body
+
+            trackTimer.schedule(timerTrackTask, 0, 10000)
         }
     }
 
@@ -124,7 +143,7 @@ class MainActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
-    private fun trackBody(pBody:Body) {
+    private fun trackBody() {
         //Get Time
         val currTime = Calendar.getInstance()
 
@@ -137,11 +156,11 @@ class MainActivity : AppCompatActivity() {
 
         val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
 
-        val equ_ofdate: Equatorial = equator(pBody, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
+        val equ_ofdate: Equatorial = equator(trackingBody!!, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
         val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
 
-        Toast.makeText(this, hor.azimuth.toString() + ' ' + hor.altitude, Toast.LENGTH_SHORT).show()
+        Log.d(DEBUG_TAG, String.format("Altitude: %f, Azimuth: %f", hor.altitude, hor.azimuth))
 
         bluetoothService.sendSlewCoords(hor.altitude, hor.azimuth)
     }
