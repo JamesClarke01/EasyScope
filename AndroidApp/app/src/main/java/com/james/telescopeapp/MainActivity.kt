@@ -45,8 +45,8 @@ private const val REQUEST_LOCATION_PERMISSION = 0
 private var lattitude = 0.0
 private var longitude = 0.0
 
-//private var trackingBody:Body? = null
-private val trackTimer = Timer()
+private var trackTimer: Timer? = null
+private var timerTrackTask: TimerTask? = null
 
 private val DEBUG_TAG = "DEBUG"
 
@@ -108,14 +108,14 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener('l'))
         findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener('u'))
         findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener('d'))
+
+        trackTimer = Timer()
     }
 
     private fun openDBTest() {
         val intent = Intent(this, DBTestActivity::class.java)
         startActivity(intent)
     }
-
-    private var timerTrackTask: TimerTask? = null
 
     private fun startTrack(pBody: Body) {
         timerTrackTask?.cancel()  //cancel currently running task if it exists
@@ -126,18 +126,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        trackTimer.schedule(timerTrackTask, 0, 10000)
+        trackTimer!!.schedule(timerTrackTask, 0, 10000)
     }
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             val body = data?.getSerializableExtra("Body") as Body
+            val bodyName = data?.getSerializableExtra("BodyName")
+            findViewById<Button>(R.id.btnSlew).text = String.format("Tracking: %s", bodyName)
             startTrack(body)
         }
     }
 
     private fun closeActivity() {
+        trackTimer!!.cancel()
         finish()
     }
 

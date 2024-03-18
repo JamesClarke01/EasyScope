@@ -33,8 +33,9 @@ class PlanetFragment : Fragment() {
     private fun trackPlanet(body:Body) {
         val resultIntent = Intent()
         val activity = requireActivity()
-        Toast.makeText(requireActivity(), "Tracking $...".format(body.name), Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireActivity(), String.format("Tracking %s", body.name), Toast.LENGTH_SHORT).show()
         resultIntent.putExtra("Body", body)
+        resultIntent.putExtra("BodyName", body.name)
         activity.setResult(Activity.RESULT_OK, resultIntent)
         activity.finish()
     }

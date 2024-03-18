@@ -49,6 +49,7 @@ class StarFragment : Fragment() {
         defineStar(Body.Star1, star.ra, star.dec, 1000.0)  //define star (object in space)
 
         resultIntent.putExtra("Body", Body.Star1)
+        resultIntent.putExtra("BodyName", star.name)
 
         activity.setResult(Activity.RESULT_OK, resultIntent)
         Toast.makeText(activity, star.name + " selected", Toast.LENGTH_SHORT).show()
