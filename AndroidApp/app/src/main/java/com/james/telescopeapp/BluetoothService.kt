@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.provider.Settings.Global
 import org.json.JSONObject
 import java.io.IOException
 import java.util.UUID
@@ -70,7 +71,10 @@ class BluetoothService : Service() {
         }
 
         override fun sendManualDirection(direction: Char) {
-            if(direction == 'l' || direction == 'r' || direction == 'u' || direction == 'd') {
+            if( direction == GlobalConstants.MAN_UP ||
+                direction == GlobalConstants.MAN_LEFT ||
+                direction == GlobalConstants.MAN_DOWN ||
+                direction == GlobalConstants.MAN_RIGHT) {
                 write(direction.toString())
             }
         }

@@ -32,10 +32,8 @@ import io.github.cosinekitty.astronomy.Observer
 import io.github.cosinekitty.astronomy.Refraction
 import io.github.cosinekitty.astronomy.Time
 import io.github.cosinekitty.astronomy.Topocentric
-import io.github.cosinekitty.astronomy.defineStar
 import io.github.cosinekitty.astronomy.equator
 import io.github.cosinekitty.astronomy.horizon
-import org.json.JSONObject
 import java.util.Calendar
 import java.util.Timer
 import java.util.TimerTask
@@ -104,10 +102,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
         findViewById<Button>(R.id.btnCalibrate).setOnClickListener{closeActivity()}
 
-        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener('r'))
-        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener('l'))
-        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener('u'))
-        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener('d'))
+        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener(GlobalConstants.MAN_UP))
+        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener(GlobalConstants.MAN_LEFT))
+        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener(GlobalConstants.MAN_DOWN))
+        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener(GlobalConstants.MAN_RIGHT))
 
         trackTimer = Timer()
     }

@@ -24,6 +24,12 @@
 #define ALT_LOW_BOUND 11
 #define ALT_HIGH_BOUND 84
 
+//Direction Bytes
+#define MAN_UP 'w'
+#define MAN_LEFT 'a'
+#define MAN_DOWN 's'
+#define MAN_RIGHT 'd'
+
 //Enums
 enum ReceiveMode {MANUAL, JSON};
 enum CoordType {ALT, AZ};
@@ -210,16 +216,16 @@ int handleJsonChar(char rChar) {
 
 int handleManualChar(char rChar) {
   switch (rChar) {
-    case 'r':  //Move Right
+    case MAN_RIGHT:  //Move Right
       direction.manualAzIncrease();
       break;
-    case 'l':  //Move Left
+    case MAN_LEFT:  //Move Left
       direction.manualAzDecrease();
       break;              
-    case 'u':  //Move Up
+    case MAN_UP:  //Move Up
       direction.manualAltIncrease();
       break;
-    case 'd':  //Move Down
+    case MAN_DOWN:  //Move Down
       direction.manualAltDecrease();
       break;    
     case '{':  //Enter json Mode
