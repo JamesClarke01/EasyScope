@@ -48,12 +48,19 @@ private var timerTrackTask: TimerTask? = null
 
 private val DEBUG_TAG = "DEBUG"
 
+enum class Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+}
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bluetoothService: MyServiceInterface
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    inner class RepeatListener(direction: Char) : OnTouchListener {
+    inner class RepeatListener(direction: Direction) : OnTouchListener {
 
         private var mHandler: Handler? = null
         private val streamRate:Long = 15
@@ -82,7 +89,23 @@ class MainActivity : AppCompatActivity() {
 
         private var actionRunnable: Runnable = object : Runnable {
             override fun run() {
-                bluetoothService.sendManualDirection(direction)
+
+                if (timerTrackTask == null) { //If not tracking, buttons manually move scope
+                    when (direction) {
+                        Direction.UP -> bluetoothService.sendManUp()
+                        Direction.LEFT -> bluetoothService.sendManLeft()
+                        Direction.DOWN -> bluetoothService.sendManDown()
+                        Direction.RIGHT -> bluetoothService.sendManRight()
+                    }
+                } else { //if tracking, buttons tweak scope
+                    when (direction) {
+                        Direction.UP -> bluetoothService.sendTweakUp()
+                        Direction.LEFT -> bluetoothService.sendTweakLeft()
+                        Direction.DOWN -> bluetoothService.sendTweakDown()
+                        Direction.RIGHT -> bluetoothService.sendTweakRight()
+                    }
+                }
+
                 mHandler?.postDelayed(this, streamRate)
             }
         }
@@ -102,10 +125,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
         findViewById<Button>(R.id.btnCalibrate).setOnClickListener{closeActivity()}
 
-        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener(GlobalConstants.MAN_UP))
-        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener(GlobalConstants.MAN_LEFT))
-        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener(GlobalConstants.MAN_DOWN))
-        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener(GlobalConstants.MAN_RIGHT))
+        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener(Direction.UP))
+        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener(Direction.LEFT))
+        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener(Direction.DOWN))
+        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener(Direction.RIGHT))
 
         trackTimer = Timer()
     }

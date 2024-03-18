@@ -17,10 +17,19 @@ interface MyServiceInterface {
 
     fun sendSlewCoords(altitude: Double, azimuth: Double)
 
-    fun sendManualDirection(direction: Char)
     fun sendCalibrationData(azimuth:Double)
 
-    fun sendReset();
+    fun sendReset()
+
+    fun sendManUp()
+    fun sendManLeft()
+    fun sendManDown()
+    fun sendManRight()
+
+    fun sendTweakUp()
+    fun sendTweakLeft()
+    fun sendTweakDown()
+    fun sendTweakRight()
 }
 
 class BluetoothService : Service() {
@@ -70,13 +79,30 @@ class BluetoothService : Service() {
             write(instructionJson.toString())
         }
 
-        override fun sendManualDirection(direction: Char) {
-            if( direction == GlobalConstants.MAN_UP ||
-                direction == GlobalConstants.MAN_LEFT ||
-                direction == GlobalConstants.MAN_DOWN ||
-                direction == GlobalConstants.MAN_RIGHT) {
-                write(direction.toString())
-            }
+        override fun sendManUp() {
+            write("w")
+        }
+        override fun sendManLeft() {
+            write("a")
+        }
+        override fun sendManDown() {
+            write("s")
+        }
+        override fun sendManRight() {
+            write("d")
+        }
+
+        override fun sendTweakUp() {
+            write("i")
+        }
+        override fun sendTweakLeft() {
+            write("j")
+        }
+        override fun sendTweakDown() {
+            write("k")
+        }
+        override fun sendTweakRight() {
+            write("l")
         }
 
         override fun sendCalibrationData(azimuth: Double) {
