@@ -9,5 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#0f1a36</color>
     <color name="foreground">#14fcfc</color>
+    <color name="background_greyed">#313642</color>
+    <color name="foreground_greyed">#c3d9d9</color>
+
     <color name="btnPressed">#47526e</color>
 </resources>

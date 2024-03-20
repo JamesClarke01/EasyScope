@@ -40,9 +40,9 @@ import java.util.Calendar
 import java.util.Timer
 import java.util.TimerTask
 
-private const val REQUEST_LOCATION_PERMISSION = 0
 
-private var lattitude = 0.0
+
+private var latitude = 0.0
 private var longitude = 0.0
 
 private var trackTimer: Timer? = null
@@ -53,7 +53,6 @@ private val DEBUG_TAG = "DEBUG"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bluetoothService: MyServiceInterface
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     inner class RepeatListener(direction: Char) : OnTouchListener {
 
@@ -95,9 +94,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        bindToBTService()
+        latitude = intent.getDoubleExtra("Latitude", 0.0)
+        longitude = intent.getDoubleExtra("Longitude", 0.0)
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        bindToBTService()
 
         findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
         findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
@@ -157,10 +157,7 @@ class MainActivity : AppCompatActivity() {
             currTime.get(Calendar.DATE),currTime.get(Calendar.HOUR_OF_DAY),
             currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble())
 
-        //Get Location
-        getCurrentLocation()
-
-        val observer = Observer(lattitude, longitude, 0.0)  //define observer (scope position on Earth)
+        val observer = Observer(latitude, longitude, 0.0)  //define observer (scope position on Earth)
 
         val equ_ofdate: Equatorial = equator(pBody!!, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
 
@@ -195,57 +192,16 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-    private fun requestLocationPermissions() {
-        ActivityCompat.requestPermissions(this,
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_LOCATION_PERMISSION
-        )
-    }
 
-    private fun getCurrentLocation() {
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestLocationPermissions()
-        }
-        fusedLocationProviderClient.lastLocation.addOnCompleteListener(this){ task->
-            val location:Location?=task.result
-            if(location==null) {
-                Toast.makeText(this, "Null Received", Toast.LENGTH_SHORT).show()
-            } else {
-                lattitude = location.latitude
-                longitude = location.longitude
-            }
-        }
-    }
+
 
     private fun locationEnabled():Boolean {
         val locationManager:LocationManager=getSystemService(LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == REQUEST_LOCATION_PERMISSION) {
-            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Location Permission Granted", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Location Permission Denied", Toast.LENGTH_SHORT).show()
-            }
-
-        }
-    }
 
     private fun bindToBTService() {
         //Overriding the serviceConnection so that bluetoothService variable can be set
