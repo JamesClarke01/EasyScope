@@ -30,6 +30,11 @@
 #define MAN_DOWN 's'
 #define MAN_RIGHT 'd'
 
+#define TWEAK_UP 'i'
+#define TWEAK_LEFT 'j'
+#define TWEAK_DOWN 'k'
+#define TWEAK_RIGHT 'l'
+
 //Enums
 enum ReceiveMode {MANUAL, JSON};
 enum CoordType {ALT, AZ};
@@ -40,11 +45,13 @@ Servo leftServo, rightServo;
 SoftwareSerial BTSerial(BT_RX, BT_TX_UNUSED); 
 
 class DirectionClass {
-  private:
-    int alt;
-    int az;
+  //private:
+  //  int alt;
+  //  int az;
 
   public:
+    int alt;
+    int az;
 
     DirectionClass() {
       //Initialise values
@@ -52,8 +59,8 @@ class DirectionClass {
       az = 0;
 
       //Move to initial positions
-      moveToAlt(ALT_LOW_BOUND);
-      moveToAz(0);
+      changeAltOrientation(ALT_LOW_BOUND);
+      changeAzOrientation(0);
     }
 
     void moveLeftServo(int pAlt) {
@@ -68,47 +75,75 @@ class DirectionClass {
       rightServo.write(map(pAlt, 0, 90, 90, 180));
     }
 
-    //Steppers
-    void moveToAlt(int pAlt) {
-      int leftAngle, rightAngle;
-      const int increment = 10;
-
-      if (pAlt >= ALT_LOW_BOUND && pAlt <= ALT_HIGH_BOUND) {                    
-        
-        //Move each servo in steps to keep the two in sync
-        if (pAlt > alt) {
-                    
-          for(int i = increment; (alt + i) <= pAlt; i += increment) {                         
-            moveLeftServo(alt+i);
-            moveRightServo(alt+i);
-            delay(100);
-          }
-        } else if (pAlt < alt) {          
-          for(int i = increment; alt - i >= pAlt; i += increment) {
-            moveLeftServo(alt-i);
-            moveRightServo(alt-i);
-            delay(100);
-          } 
-        }
-
-        //Move the remainder
-        moveLeftServo(pAlt);
-        moveRightServo(pAlt);
-        
-        alt = pAlt; //update current alt
-      }
-    }
-
     void manualAltIncrease(void) {
-      moveToAlt(alt+SERVO_STEP);
+      changeAltOrientation(alt+SERVO_STEP);
     }
 
     void manualAltDecrease(void) {
-      moveToAlt(alt-SERVO_STEP);
+      changeAltOrientation(alt-SERVO_STEP);
     }
 
-    //Servos
-    void moveToAz(int pAz) {
+    void manualAzIncrease(void) {
+      az += MANUAL_STEPS;
+      stepper.step(MANUAL_STEPS, FORWARD, INTERLEAVE);  
+    }
+
+    void manualAzDecrease(void) {
+      az -= MANUAL_STEPS;
+      stepper.step(MANUAL_STEPS, BACKWARD, INTERLEAVE);  
+    }
+
+    void tweakAltIncrease(void) {
+      moveVertically(alt+SERVO_STEP);
+    }
+
+    void tweakAltDecrease(void) {
+      moveVertically(alt -= SERVO_STEP);
+    }
+
+    void tweakAzIncrease(void) {
+      moveHorizontally(az += MANUAL_STEPS);
+    }
+
+    void tweakAzDecrease(void) {
+      moveHorizontally(az -= MANUAL_STEPS);
+    }    
+
+    int moveVertically(int pAlt) {
+      //Function Desc: Moves scope vertically but does not update alt value
+
+      int leftAngle, rightAngle;
+      const int increment = 10;
+
+      if (pAlt < ALT_LOW_BOUND || pAlt > ALT_HIGH_BOUND) {                    
+        return 1; //out of bounds
+      }
+
+      //Move each servo in steps to keep the two in sync
+      if (pAlt > alt) {
+                  
+        for(int i = increment; (alt + i) <= pAlt; i += increment) {                         
+          moveLeftServo(alt+i);
+          moveRightServo(alt+i);
+          delay(100);
+        }
+      } else if (pAlt < alt) {          
+        for(int i = increment; alt - i >= pAlt; i += increment) {
+          moveLeftServo(alt-i);
+          moveRightServo(alt-i);
+          delay(100);
+        } 
+      }
+
+      //Move the remainder
+      moveLeftServo(pAlt);
+      moveRightServo(pAlt);    
+      
+      return 0;
+    }
+
+    int moveHorizontally(int pAz) {
+      //Function Desc: Moves scope horizontally but does not update az value
       int direction;
       int degToMove = pAz-az;
       int stepsToMove;
@@ -122,22 +157,25 @@ class DirectionClass {
       stepsToMove = map(abs(degToMove), 0, 360, 0, STEPS_PER_REV);
 
       stepper.step(stepsToMove, direction, INTERLEAVE);
-      //Serial.println(degToMove);
-
-      az = pAz;
+      
+      return 0;
     }
 
-    manualAzIncrease(void) {
-      az += MANUAL_STEPS;
-      stepper.step(MANUAL_STEPS, FORWARD, INTERLEAVE);  
+    void changeAltOrientation(int pAlt) {
+      //Function Desc: Moves scope vertically and updates alt value
+      if(moveVertically(pAlt) == 0) {
+        alt = pAlt; //update current alt
+      }
     }
 
-    manualAzDecrease(void) {
-      az -= MANUAL_STEPS;
-      stepper.step(MANUAL_STEPS, BACKWARD, INTERLEAVE);  
+    void changeAzOrientation(int pAz) {
+      //Function Desc: Moves scope horizontally and updates az value
+      if(moveHorizontally(pAz) == 0) {
+        az = pAz;
+      }
     }
 
-    void setAz(double pAz) {
+    void setAzValue(double pAz) {
       az = pAz;
       Serial.print("New Azimuth Value: ");
       Serial.print(az);
@@ -182,9 +220,12 @@ void setup()
  
 void loop()
 {  
+  
+  //Serial.println(direction.alt);
+  
   if(BTSerial.available()) {
     char rChar = BTSerial.read();
-    Serial.println(rChar);
+    //Serial.println(rChar);
 
     switch (receiveMode) {      
       case MANUAL:
@@ -216,20 +257,32 @@ int handleJsonChar(char rChar) {
 
 int handleManualChar(char rChar) {
   switch (rChar) {
-    case MAN_RIGHT:  //Move Right
-      direction.manualAzIncrease();
-      break;
-    case MAN_LEFT:  //Move Left
-      direction.manualAzDecrease();
-      break;              
-    case MAN_UP:  //Move Up
+    case MAN_UP:  
       direction.manualAltIncrease();
       break;
-    case MAN_DOWN:  //Move Down
+    case MAN_LEFT:  
+      direction.manualAzDecrease();
+      break;  
+    case MAN_DOWN:  
       direction.manualAltDecrease();
+      break;      
+    case MAN_RIGHT:  
+      direction.manualAzIncrease();
       break;    
+    case TWEAK_UP:  
+      direction.tweakAltIncrease();
+      break;
+    case TWEAK_LEFT:  
+      direction.tweakAzDecrease();
+      break;  
+    case TWEAK_DOWN:  
+      direction.tweakAltDecrease();
+      break;      
+    case TWEAK_RIGHT:  
+      direction.tweakAzIncrease();
+      break;                   
     case '{':  //Enter json Mode
-      Serial.println("Entering JSON mode...");
+      Serial.println(direction.alt);
       curlyCount = 1;
       jsonString = "{";
       receiveMode = JSON;
@@ -239,7 +292,7 @@ int handleManualChar(char rChar) {
 
 void processJSON(String pJson) {
  
-  Serial.println("Processing JSON...");
+  //Serial.println("Processing JSON...");
   StaticJsonDocument<100> doc;
   char* jsonArray = new char[pJson.length()+1];  //allocate a new json array on the heap
   
@@ -268,16 +321,16 @@ void processJSON(String pJson) {
 }
 
 void slew(double alt, double az) {
-  Serial.println("Slewing");     
-  direction.moveToAlt(alt);
-  direction.moveToAz(az);
+  //Serial.println("Slewing");     
+  direction.changeAltOrientation(alt);
+  direction.changeAzOrientation(az);
 }
 
 void calibrate(double pAz) {
-  direction.setAz(pAz);
+  direction.setAzValue(pAz);
 }
 
 void reset() {
-  direction.moveToAlt(ALT_LOW_BOUND);
+  direction.changeAltOrientation(ALT_LOW_BOUND);
 }
 
