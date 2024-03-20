@@ -32,7 +32,7 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         setContentView(R.layout.activity_calibrate)
 
         bindToBTService()
-        reset()
+
         setupSensors()
 
         findViewById<Button>(R.id.btnCalibrate).setOnClickListener{calibrate()}
@@ -41,7 +41,7 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        reset()
+        bluetoothService?.sendReset()
     }
 
     private fun setupSensors() {
@@ -53,10 +53,6 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
             sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
-    }
-
-    private fun reset() {
-        bluetoothService?.sendReset()
     }
 
     private fun calibrate() {
@@ -72,9 +68,9 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         //Overriding the serviceConnection so that bluetoothService variable can be set
         val serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                bluetoothService = (service as BluetoothService.MyBinder).also {
-                    // Service is connected, you can now call methods on the service
-                }
+                bluetoothService = (service as BluetoothService.MyBinder)
+
+                bluetoothService?.sendReset()
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {

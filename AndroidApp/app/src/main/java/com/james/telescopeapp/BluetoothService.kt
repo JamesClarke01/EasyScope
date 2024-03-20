@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import org.json.JSONObject
 import java.io.IOException
 import java.util.UUID
@@ -50,6 +51,7 @@ class BluetoothService : Service() {
         override fun write(data: String) {
             if (bluetoothSocket != null) {
                 try { // Converting the string to bytes for transferring
+                    Log.d("BT", data)
                     bluetoothSocket!!.outputStream.write(data.toByteArray())
                 } catch (e: IOException) {
                     e.printStackTrace()
