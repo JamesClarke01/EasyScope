@@ -1,7 +1,9 @@
 package com.james.telescopeapp
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
@@ -10,6 +12,12 @@ class ObjectSelectActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_object_select)
         setupTabView()
+        findViewById<Button>(R.id.btnCancel).setOnClickListener{cancelSlew()}
+    }
+
+    private fun cancelSlew() {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 
     private fun setupTabView() {

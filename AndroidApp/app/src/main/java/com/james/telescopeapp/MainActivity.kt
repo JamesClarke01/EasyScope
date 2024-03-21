@@ -40,8 +40,6 @@ import java.util.Calendar
 import java.util.Timer
 import java.util.TimerTask
 
-
-
 private var latitude = 0.0
 private var longitude = 0.0
 
@@ -136,6 +134,9 @@ class MainActivity : AppCompatActivity() {
             val bodyName = data?.getSerializableExtra("BodyName")
             findViewById<Button>(R.id.btnSlew).text = String.format("Tracking: %s", bodyName)
             startTrack(body)
+        } else if (result.resultCode == Activity.RESULT_CANCELED) {
+            timerTrackTask?.cancel()  //Cancel task if assigned
+            bluetoothService.sendReset() //Reset scope motors
         }
     }
 
