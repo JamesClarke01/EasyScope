@@ -19,7 +19,6 @@ class ObjectSelectActivity : AppCompatActivity() {
 
         fragmentAdapter.addFragment(StarFragment(), "Stars")
         fragmentAdapter.addFragment(PlanetFragment(), "Planets")
-        fragmentAdapter.addFragment(SatelliteFragment(), "Satellites")
 
         viewPager.adapter = fragmentAdapter
         tabLayout.setupWithViewPager(viewPager)
