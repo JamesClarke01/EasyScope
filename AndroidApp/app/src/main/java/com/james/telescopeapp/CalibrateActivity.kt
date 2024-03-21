@@ -43,6 +43,8 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calibrate)
 
+        lockNextButton()
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         bindToBTService()
