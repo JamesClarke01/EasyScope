@@ -60,24 +60,6 @@ class StarDBHelper(private val context: Context): SQLiteOpenHelper(context, DATA
                 db?.insert(TABLE_NAME, null, values)
             }
         }
-
-
-        /*
-        values.put(COL_NAME, "Polaris")
-        values.put(COL_RA, 3.06)
-        values.put(COL_DEC, 89.36572)
-        db?.insert(TABLE_NAME, null, values)
-
-        values.put(COL_NAME, "Alderamin")
-        values.put(COL_RA, 18.616)
-        values.put(COL_DEC, 62.6903)
-        db?.insert(TABLE_NAME, null, values)
-
-        values.put(COL_NAME, "Capella")
-        values.put(COL_RA, 5.3)
-        values.put(COL_DEC, 46.0217)
-        db?.insert(TABLE_NAME, null, values)
-         */
     }
 
     fun getAllStars(): List<Star> {
