@@ -21,7 +21,7 @@
 #define BT_TX_UNUSED 0
 
 //Bounds
-#define ALT_LOW_BOUND 11
+#define ALT_LOW_BOUND 12
 #define ALT_HIGH_BOUND 84
 
 //Enums
