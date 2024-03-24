@@ -11,8 +11,6 @@ class StarAdapter(private var stars: List<Star>, context: Context): RecyclerView
 
     class StarViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val txtStarName: TextView = itemView.findViewById(R.id.txtStarName)
-        val txtStarRa: TextView = itemView.findViewById(R.id.txtStarRa)
-        val txtStarDec: TextView = itemView.findViewById(R.id.txtStarDec)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StarViewHolder {
@@ -23,8 +21,6 @@ class StarAdapter(private var stars: List<Star>, context: Context): RecyclerView
     override fun onBindViewHolder(holder: StarViewHolder, position: Int) {
         val star = stars[position]
         holder.txtStarName.text = star.name
-        holder.txtStarRa.text = star.ra.toString()
-        holder.txtStarDec.text = star.dec.toString()
 
         holder.itemView.setOnClickListener{
             onItemClick(star)
