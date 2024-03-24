@@ -6,8 +6,10 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import org.json.JSONArray
+import org.json.JSONObject
 
-class StarDBHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
+class StarDBHelper(private val context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
 
     companion object {
         private const val DATABASE_NAME = "stars.db"
@@ -37,6 +39,29 @@ class StarDBHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
     private fun insertInitialData(db: SQLiteDatabase?) {
         val values = ContentValues()
 
+        val jsonFileName = "StarData.json"
+        val inputStream = context.assets.open(jsonFileName)
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+        val jsonString = String(buffer, Charsets.UTF_8)
+        val jsonObject = JSONObject(jsonString)
+
+        val starArray:JSONArray? = jsonObject.optJSONArray("Stars")
+
+        if (starArray != null) {
+            for (i in 0 until starArray.length()) {
+                val star = starArray.getJSONObject(i)
+                values.put(COL_NAME, star.getString("Name"))
+                values.put(COL_RA, star.getDouble("RA"))
+                values.put(COL_DEC, star.getDouble("DEC"))
+                db?.insert(TABLE_NAME, null, values)
+            }
+        }
+
+
+        /*
         values.put(COL_NAME, "Polaris")
         values.put(COL_RA, 3.06)
         values.put(COL_DEC, 89.36572)
@@ -51,6 +76,7 @@ class StarDBHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
         values.put(COL_RA, 5.3)
         values.put(COL_DEC, 46.0217)
         db?.insert(TABLE_NAME, null, values)
+         */
     }
 
     fun getAllStars(): List<Star> {

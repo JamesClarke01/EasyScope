@@ -1,0 +1,19 @@
+{
+  "Stars": [
+    {
+      "Name": "Polaris",
+      "RA": 3.06,
+      "DEC": 89.36572
+    },
+    {
+      "Name": "Alderamin",
+      "RA": 18.616,
+      "DEC": 62.6903
+    },
+    {
+      "Name": "Capella",
+      "RA": 5.3,
+      "DEC": 46.0217
+    }
+  ]
+}
