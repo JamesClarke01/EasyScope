@@ -13,7 +13,7 @@ class StarDBHelper(private val context: Context): SQLiteOpenHelper(context, DATA
 
     companion object {
         private const val DATABASE_NAME = "stars.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 3
         private const val TABLE_NAME = "stars"
         private const val COL_ID = "id"
         private const val COL_NAME = "name"
@@ -22,6 +22,7 @@ class StarDBHelper(private val context: Context): SQLiteOpenHelper(context, DATA
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
+
         val createTableQuery = "CREATE TABLE $TABLE_NAME (   $COL_ID INTEGER PRIMARY KEY, " +
                                                             "$COL_NAME TEXT, " +
                                                             "$COL_RA DOUBLE," +
