@@ -81,17 +81,4 @@ class StarDBHelper(private val context: Context): SQLiteOpenHelper(context, DATA
         db.close()
         return starList
     }
-
-    /*
-    fun insertStar(star: Star) {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_NAME, star.name)
-            put(COLUMN_RA, star.ra)
-            put(COLUMN_DEC, star.dec)
-        }
-        db.insert(TABLE_NAME, null, values)
-        db.close()
-    }
-     */
 }
