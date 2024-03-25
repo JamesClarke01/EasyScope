@@ -110,11 +110,6 @@ class MainActivity : AppCompatActivity() {
         trackTimer = Timer()
     }
 
-    private fun openDBTest() {
-        val intent = Intent(this, DBTestActivity::class.java)
-        startActivity(intent)
-    }
-
     private fun startTrack(pBody: Body) {
         timerTrackTask?.cancel()  //cancel currently running task if it exists
 
