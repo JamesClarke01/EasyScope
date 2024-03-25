@@ -132,6 +132,7 @@ class MainActivity : AppCompatActivity() {
         } else if (result.resultCode == Activity.RESULT_CANCELED) {
             timerTrackTask?.cancel()  //Cancel task if assigned
             bluetoothService.sendReset() //Reset scope motors
+            findViewById<Button>(R.id.btnSlew).text = getString(R.string.btnSlew)  //Reset text to default
         }
     }
 
@@ -188,16 +189,10 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-
-
-
-
     private fun locationEnabled():Boolean {
         val locationManager:LocationManager=getSystemService(LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
-
-
 
     private fun bindToBTService() {
         //Overriding the serviceConnection so that bluetoothService variable can be set

@@ -18,7 +18,8 @@
             android:id="@+id/planetRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:colorEdgeEffect="@color/foreground"/>
     </LinearLayout>
 
 

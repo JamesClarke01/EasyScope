@@ -27,8 +27,7 @@
         <activity
             android:name=".ObjectSelectActivity"
             android:exported="false"
-            android:label="@string/title_activity_object_select"
-            android:theme="@style/Theme.TelescopeApp.NoActionBar" />
+            android:label="@string/title_activity_object_select" />
         <activity
             android:name=".DebugActivity"
             android:exported="false" />
