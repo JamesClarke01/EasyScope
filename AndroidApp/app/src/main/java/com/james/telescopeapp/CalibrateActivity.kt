@@ -1,9 +1,11 @@
 package com.james.telescopeapp
 
 import android.Manifest
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -14,12 +16,21 @@ import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.location.SettingsClient
+import com.google.android.gms.tasks.Task
 
 private const val REQUEST_LOCATION_PERMISSION = 0
 
@@ -74,8 +85,7 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
     private fun calibrate() {
         Log.d("SensorValues", "Accelerometer: ${accelerometerValues.joinToString()}")
         Log.d("SensorValues", "Magnetometer: ${magnetometerValues.joinToString()}")
-        Toast.makeText(this, azimuth.toString(), Toast.LENGTH_SHORT).show()
-
+        Toast.makeText(this, String.format("Direction: %f", azimuth), Toast.LENGTH_SHORT).show()
         lockNextButton()
         bluetoothService?.sendCalibrationData(azimuth)
         getCurrentLocation()
@@ -142,8 +152,14 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
         
     }
 
-    private fun getCurrentLocation() {
+    private val locationRequest = LocationRequest.create().apply {
+        interval = 10000 // Update interval in milliseconds (e.g., every 10 seconds)
+        fastestInterval = 5000 // Fastest update interval in milliseconds
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY // Request high accuracy location updates
+    }
 
+    private fun getCurrentLocation() {
+        // Check for location permissions
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -152,19 +168,107 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+            // Request location permissions if not granted
             requestLocationPermissions()
+            return
         }
-        fusedLocationProviderClient.lastLocation.addOnCompleteListener(this){ task->
-            val location: Location?=task.result
-            if(location==null) {
-                Toast.makeText(this, "Null Received", Toast.LENGTH_SHORT).show()
+
+        // Check if location settings are enabled
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+
+        val client: SettingsClient = LocationServices.getSettingsClient(this)
+        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException) {
+                try {
+                    exception.startResolutionForResult(this, 1001)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    // Ignore the error.
+                }
             } else {
-                latitude = location.latitude
-                longitude = location.longitude
-                Toast.makeText(this, String.format("Latitude: %f, Longitude: %f", latitude, longitude), Toast.LENGTH_SHORT).show()
-                unlockNextButton()
+                Toast.makeText(this, "Failed to check location settings", Toast.LENGTH_SHORT).show()
             }
         }
+
+        task.addOnSuccessListener {
+            getLocation()
+        }
+    }
+
+    private fun getLocation() {
+        Toast.makeText(
+            this,
+            String.format("Retrieving Location..."),
+            Toast.LENGTH_SHORT
+        ).show()
+
+        // Request location updates using FusedLocationProviderClient
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001) {
+            if (resultCode == Activity.RESULT_OK) {
+                getLocation()
+            } else {
+                Toast.makeText(this, "Location services not enabled", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Location callback to handle location updates
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            locationResult ?: return
+            val location = locationResult.lastLocation
+            // Location found, handle the location data
+            if(location != null) {
+                handleLocation(location!!)
+            } else {
+                Toast.makeText(this@CalibrateActivity, "Enable location.", Toast.LENGTH_SHORT).show()
+            }
+            // Stop receiving location updates
+            stopLocationUpdates()
+        }
+    }
+
+    // Function to handle the location data
+    private fun handleLocation(location: Location) {
+        val latitude = location.latitude
+        val longitude = location.longitude
+        // Do something with the location data (e.g., display it)
+        Toast.makeText(
+            this,
+            String.format("Latitude: %f, Longitude: %f", latitude, longitude),
+            Toast.LENGTH_SHORT
+        ).show()
+        unlockNextButton()
+    }
+
+    // Function to stop receiving location updates
+    private fun stopLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
     private fun requestLocationPermissions() {
