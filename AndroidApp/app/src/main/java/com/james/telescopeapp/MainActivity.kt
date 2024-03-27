@@ -145,22 +145,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun checkLocationPermissions():Boolean {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED)
-        {
-            return true
-        }
-        return false
-    }
-
-    private fun locationEnabled():Boolean {
-        val locationManager:LocationManager=getSystemService(LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-    }
-
     private fun bindToBTService() {
         //Overriding the serviceConnection so that bluetoothService variable can be set
         val serviceConnection = object : ServiceConnection {
