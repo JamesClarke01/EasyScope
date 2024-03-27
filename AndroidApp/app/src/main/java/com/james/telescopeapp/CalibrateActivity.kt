@@ -34,8 +34,8 @@ import com.google.android.gms.tasks.Task
 
 private const val REQUEST_LOCATION_PERMISSION = 0
 
-private var latitude = 0.0
-private var longitude = 0.0
+private var latitude: Double? = null
+private var longitude: Double? = null
 
 class CalibrateActivity : AppCompatActivity(), SensorEventListener {
 
@@ -255,14 +255,15 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
 
     // Function to handle the location data
     private fun handleLocation(location: Location) {
-        val latitude = location.latitude
-        val longitude = location.longitude
+        latitude = location.latitude
+        longitude = location.longitude
         // Do something with the location data (e.g., display it)
         Toast.makeText(
             this,
             String.format("Latitude: %f, Longitude: %f", latitude, longitude),
             Toast.LENGTH_SHORT
         ).show()
+
         unlockNextButton()
     }
 
