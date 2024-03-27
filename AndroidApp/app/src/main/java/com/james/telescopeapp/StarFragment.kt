@@ -15,7 +15,6 @@ import io.github.cosinekitty.astronomy.defineStar
 
 class StarFragment : Fragment() {
 
-
     private lateinit var activity: Activity
     private lateinit var binding: FragmentStarBinding
     private lateinit var db: StarDBHelper

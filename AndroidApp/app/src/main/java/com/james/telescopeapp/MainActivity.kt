@@ -146,21 +146,9 @@ class MainActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
+
     private fun trackBody(pBody: Body) {
-        //Get Time
-        val currTime = Calendar.getInstance()
-
-        val time = Time(currTime.get(Calendar.YEAR),currTime.get(Calendar.MONTH),
-            currTime.get(Calendar.DATE),currTime.get(Calendar.HOUR_OF_DAY),
-            currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble())
-
-        val observer = Observer(latitude, longitude, 0.0)  //define observer (scope position on Earth)
-
-        val equ_ofdate: Equatorial = equator(pBody!!, time, observer, EquatorEpoch.OfDate, Aberration.Corrected)  //define equatorial coordinates of star for current time
-
-        val hor: Topocentric = horizon(time, observer, equ_ofdate.ra, equ_ofdate.dec, Refraction.Normal)  //translate equatorial coordinates to horizontal coordinates
-
-        Log.d(DEBUG_TAG, String.format("Altitude: %f, Azimuth: %f", hor.altitude, hor.azimuth))
+        val hor = SharedTrackingMethods.getHorCoords(pBody, latitude, longitude)
 
         bluetoothService.sendSlewCoords(hor.altitude, hor.azimuth)
     }
