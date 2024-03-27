@@ -8,40 +8,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.Button
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import io.github.cosinekitty.astronomy.Aberration
 import io.github.cosinekitty.astronomy.Body
-import io.github.cosinekitty.astronomy.EquatorEpoch
-import io.github.cosinekitty.astronomy.Equatorial
-import io.github.cosinekitty.astronomy.Observer
-import io.github.cosinekitty.astronomy.Refraction
-import io.github.cosinekitty.astronomy.Time
-import io.github.cosinekitty.astronomy.Topocentric
-import io.github.cosinekitty.astronomy.defineStar
-import io.github.cosinekitty.astronomy.equator
-import io.github.cosinekitty.astronomy.horizon
-import org.json.JSONObject
-import java.util.Calendar
 import java.util.Timer
 import java.util.TimerTask
-
-private var latitude = 0.0
-private var longitude = 0.0
 
 private var trackTimer: Timer? = null
 private var timerTrackTask: TimerTask? = null
@@ -91,9 +71,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        latitude = intent.getDoubleExtra("Latitude", 0.0)
-        longitude = intent.getDoubleExtra("Longitude", 0.0)
 
         bindToBTService()
 
@@ -148,9 +125,11 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun trackBody(pBody: Body) {
-        val hor = SharedTrackingMethods.getHorCoords(pBody, latitude, longitude)
+        val hor = SharedTrackingUtility.getHorCoords(pBody)
 
-        bluetoothService.sendSlewCoords(hor.altitude, hor.azimuth)
+        if(hor != null) {
+            bluetoothService.sendSlewCoords(hor.altitude, hor.azimuth)
+        }
     }
 
     private fun openDebugActivity() {

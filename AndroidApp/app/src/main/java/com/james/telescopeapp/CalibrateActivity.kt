@@ -34,9 +34,6 @@ import com.google.android.gms.tasks.Task
 
 private const val REQUEST_LOCATION_PERMISSION = 0
 
-private var latitude: Double? = null
-private var longitude: Double? = null
-
 class CalibrateActivity : AppCompatActivity(), SensorEventListener {
 
     private var bluetoothService: MyServiceInterface? = null
@@ -126,8 +123,6 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
 
     private fun openMainActivity() {
         var mainIntent = Intent(this, MainActivity::class.java)
-        mainIntent.putExtra("Latitude", latitude)
-        mainIntent.putExtra("Longitude", longitude)
         startActivity(mainIntent);
     }
 
@@ -255,12 +250,12 @@ class CalibrateActivity : AppCompatActivity(), SensorEventListener {
 
     // Function to handle the location data
     private fun handleLocation(location: Location) {
-        latitude = location.latitude
-        longitude = location.longitude
+        SharedTrackingUtility.latitude = location.latitude
+        SharedTrackingUtility.longitude = location.longitude
         // Do something with the location data (e.g., display it)
         Toast.makeText(
             this,
-            String.format("Latitude: %f, Longitude: %f", latitude, longitude),
+            String.format("Latitude: %f, Longitude: %f", SharedTrackingUtility.latitude, SharedTrackingUtility.longitude),
             Toast.LENGTH_SHORT
         ).show()
 
