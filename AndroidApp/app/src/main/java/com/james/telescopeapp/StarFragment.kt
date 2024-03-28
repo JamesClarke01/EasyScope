@@ -32,7 +32,7 @@ class StarFragment : Fragment() {
         activity = requireActivity()
 
         db = StarDBHelper(requireContext())
-        starAdapter = StarAdapter(db.getAllStars(), requireContext())
+        starAdapter = StarAdapter(requireContext(), db.getAllStars())
 
         binding.starRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.starRecyclerView.adapter = starAdapter
@@ -43,16 +43,20 @@ class StarFragment : Fragment() {
     }
 
     fun selectStar(star:Star) {
-        val resultIntent = Intent()
+        if(SharedTrackingUtility.starUnderHorizon(star)) {
+            Toast.makeText(requireActivity(), "Not Visible", Toast.LENGTH_SHORT).show()
+        } else {
+            val resultIntent = Intent()
 
-        defineStar(Body.Star1, star.ra, star.dec, 1000.0)  //define star (object in space)
+            defineStar(Body.Star1, star.ra, star.dec, 1000.0)  //define star (object in space)
 
-        resultIntent.putExtra("Body", Body.Star1)
-        resultIntent.putExtra("BodyName", star.name)
+            resultIntent.putExtra("Body", Body.Star1)
+            resultIntent.putExtra("BodyName", star.name)
 
-        activity.setResult(Activity.RESULT_OK, resultIntent)
-        Toast.makeText(activity, star.name + " selected", Toast.LENGTH_SHORT).show()
-        activity.finish()
+            activity.setResult(Activity.RESULT_OK, resultIntent)
+            Toast.makeText(activity, star.name + " selected", Toast.LENGTH_SHORT).show()
+            activity.finish()
+        }
     }
 
     override fun onResume() {

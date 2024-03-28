@@ -1,13 +1,17 @@
 package com.james.telescopeapp
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import io.github.cosinekitty.astronomy.Body
+import io.github.cosinekitty.astronomy.defineStar
 
-class StarAdapter(private var stars: List<Star>, context: Context): RecyclerView.Adapter<StarAdapter.StarViewHolder>(){
+class StarAdapter( private val context: Context, private var stars: List<Star>): RecyclerView.Adapter<StarAdapter.StarViewHolder>(){
 
     private var onItemClickListener: OnItemClickListener? = null
 
@@ -22,7 +26,14 @@ class StarAdapter(private var stars: List<Star>, context: Context): RecyclerView
 
     override fun onBindViewHolder(holder: StarViewHolder, position: Int) {
         val star = stars[position]
+
         holder.txtStarName.text = star.name
+
+        if(SharedTrackingUtility.starUnderHorizon(star)) {
+            holder.txtStarName.setTextColor(Color.GRAY)
+        } else {
+            holder.txtStarName.setTextColor(ContextCompat.getColor(context, R.color.foreground))
+        }
 
         holder.itemView.setOnClickListener{
             onItemClick(star)

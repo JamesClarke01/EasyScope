@@ -1,13 +1,16 @@
 package com.james.telescopeapp
 
+import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import io.github.cosinekitty.astronomy.Body
 
-class PlanetAdapter(private val planets: List<Body>) : RecyclerView.Adapter<PlanetAdapter.PlanetViewHolder>(){
+class PlanetAdapter(private val context: Context, private val planets: List<Body>) : RecyclerView.Adapter<PlanetAdapter.PlanetViewHolder>(){
 
     private var onItemClickListener: PlanetAdapter.OnItemClickListener? = null
 
@@ -24,6 +27,12 @@ class PlanetAdapter(private val planets: List<Body>) : RecyclerView.Adapter<Plan
         val planet = planets[position]
 
         holder.txtPlanetName.text = planet.name
+
+        if(SharedTrackingUtility.bodyUnderHorizon(planet)) {
+            holder.txtPlanetName.setTextColor(Color.GRAY)
+        } else {
+            holder.txtPlanetName.setTextColor(ContextCompat.getColor(context, R.color.foreground))
+        }
 
         holder.itemView.setOnClickListener{
             onItemClick(planet)

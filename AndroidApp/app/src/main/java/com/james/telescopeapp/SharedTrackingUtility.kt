@@ -9,17 +9,30 @@ import io.github.cosinekitty.astronomy.Observer
 import io.github.cosinekitty.astronomy.Refraction
 import io.github.cosinekitty.astronomy.Time
 import io.github.cosinekitty.astronomy.Topocentric
+import io.github.cosinekitty.astronomy.defineStar
 import io.github.cosinekitty.astronomy.equator
 import io.github.cosinekitty.astronomy.horizon
 import java.util.Calendar
 
 private val DEBUG_TAG = "DEBUG"
+private val HORIZON_ALT = 13
 
 //Defining as object implements singleton pattern
 object SharedTrackingUtility {
 
     var latitude: Double? = null
     var longitude: Double? = null
+
+    fun starUnderHorizon(star: Star): Boolean {
+        defineStar(Body.Star1, star.ra, star.dec, 1000.0)
+        val hor = getHorCoords(Body.Star1)
+        return hor!!.altitude < HORIZON_ALT
+    }
+
+    fun bodyUnderHorizon(body: Body): Boolean {
+        val hor = getHorCoords(body)
+        return hor!!.altitude < HORIZON_ALT
+    }
 
     fun getHorCoords(pBody: Body): Topocentric? {
         if (latitude != null && longitude != null) {

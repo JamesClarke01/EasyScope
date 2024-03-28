@@ -34,7 +34,7 @@ class PlanetFragment : Fragment() {
 
         activity = requireActivity()
 
-        planetAdapter = PlanetAdapter(planets)
+        planetAdapter = PlanetAdapter(requireContext(), planets)
 
         binding.planetRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.planetRecyclerView.adapter = planetAdapter
@@ -45,12 +45,22 @@ class PlanetFragment : Fragment() {
     }
 
     private fun selectPlanet(body:Body) {
-        val resultIntent = Intent()
-        val activity = requireActivity()
-        Toast.makeText(requireActivity(), String.format("Tracking %s", body.name), Toast.LENGTH_SHORT).show()
-        resultIntent.putExtra("Body", body)
-        resultIntent.putExtra("BodyName", body.name)
-        activity.setResult(Activity.RESULT_OK, resultIntent)
-        activity.finish()
+        if (SharedTrackingUtility.bodyUnderHorizon(body)) {
+            Toast.makeText(requireActivity(), "Not Visible", Toast.LENGTH_SHORT).show()
+        } else {
+            val resultIntent = Intent()
+            val activity = requireActivity()
+            Toast.makeText(
+                requireActivity(),
+                String.format("Tracking %s", body.name),
+                Toast.LENGTH_SHORT
+            ).show()
+            resultIntent.putExtra("Body", body)
+            resultIntent.putExtra("BodyName", body.name)
+            activity.setResult(Activity.RESULT_OK, resultIntent)
+            activity.finish()
+        }
     }
+
+
 }
