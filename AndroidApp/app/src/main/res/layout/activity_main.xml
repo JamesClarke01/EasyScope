@@ -71,20 +71,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.082" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnDebug"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Debug"
-        android:textColor="@color/foreground"
-        android:background="@drawable/button_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.108"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
-
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"

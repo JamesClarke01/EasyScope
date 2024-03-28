@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
         bindToBTService()
 
         findViewById<Button>(R.id.btnDisconnect).setOnClickListener{disconnect()}
-        findViewById<Button>(R.id.btnDebug).setOnClickListener{openDebugActivity()}
         findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
         findViewById<Button>(R.id.btnCalibrate).setOnClickListener{closeActivity()}
 
@@ -130,11 +129,6 @@ class MainActivity : AppCompatActivity() {
         if(hor != null) {
             bluetoothService.sendSlewCoords(hor.altitude, hor.azimuth)
         }
-    }
-
-    private fun openDebugActivity() {
-        val intent = Intent(this, DebugActivity::class.java)
-        startActivity(intent)
     }
 
     private fun disconnect() {
