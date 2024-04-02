@@ -151,7 +151,7 @@ class ConnectActivity : AppCompatActivity() {
 
             bluetoothAdapter?.cancelDiscovery() //cancel discovery or it will slow connection
 
-            startConnectActivity()
+            startCalibrateActivity()
         } else {
             Toast.makeText(this, "Bluetooth must be enabled", Toast.LENGTH_SHORT).show()
             setupBluetooth()
@@ -159,7 +159,7 @@ class ConnectActivity : AppCompatActivity() {
 
     }
 
-    private fun startConnectActivity() {
+    private fun startCalibrateActivity() {
         val intent = Intent(this, CalibrateActivity::class.java)
         startActivity(intent)
     }
