@@ -2,69 +2,77 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnLeft"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="◄"
-        android:textColor="@color/foreground"
-        android:background="@drawable/button_background"
-        app:layout_constraintEnd_toStartOf="@+id/btnUp"
-        app:layout_constraintTop_toBottomOf="@+id/btnUp" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnRight"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="►"
-        android:textColor="@color/foreground"
-        android:background="@drawable/button_background"
-        app:layout_constraintStart_toEndOf="@+id/btnUp"
-        app:layout_constraintTop_toBottomOf="@+id/btnUp" />
-
-    <androidx.appcompat.widget.AppCompatButton
+    <ImageButton
         android:id="@+id/btnUp"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="284dp"
-        android:text="▲"
-        android:textColor="@color/foreground"
-        android:background="@drawable/button_background"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:background="@color/background"
+        android:scaleType="fitCenter"
+        android:src="@drawable/manual_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.361" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <ImageButton
         android:id="@+id/btnDown"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textColor="@color/foreground"
-        android:background="@drawable/button_background"
-        android:text="▼"
-        app:layout_constraintEnd_toStartOf="@+id/btnRight"
-        app:layout_constraintStart_toEndOf="@+id/btnLeft"
-        app:layout_constraintTop_toBottomOf="@+id/btnRight" />
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:background="@color/background"
+        android:rotationX="180"
+        android:scaleType="fitCenter"
+        android:src="@drawable/manual_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.609" />
+
+    <ImageButton
+        android:id="@+id/btnLeft"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:background="@color/background"
+        android:rotation="-90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/manual_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.252"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.486" />
+
+    <ImageButton
+        android:id="@+id/btnRight"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:background="@color/background"
+        android:rotation="90"
+        android:scaleType="fitCenter"
+        android:src="@drawable/manual_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.486" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSlew"
         android:layout_width="250dp"
         android:layout_height="100dp"
+        android:background="@drawable/button_background"
         android:text="@string/btnSlew"
         android:textColor="@color/foreground"
-        android:background="@drawable/button_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,6 +80,7 @@
         app:layout_constraintVertical_bias="0.082" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -81,21 +90,23 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnDisconnect"
-            android:textColor="@color/foreground"
-            android:background="@drawable/button_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="Disconnect" />
+            android:background="@drawable/button_background"
+            android:text="Disconnect"
+            android:textColor="@color/foreground" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:textColor="@color/foreground"
-            android:background="@drawable/button_background"
             android:id="@+id/btnCalibrate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="@string/mainBtnCalibrate" />
+            android:background="@drawable/button_background"
+            android:text="@string/mainBtnCalibrate"
+            android:textColor="@color/foreground" />
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
