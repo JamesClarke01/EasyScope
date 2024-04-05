@@ -29,8 +29,17 @@ class PlanetFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val planets = listOf(Body.Moon, Body.Jupiter, Body.Saturn, Body.Venus, Body.Mars,
-            Body.Neptune, Body.Uranus, Body.Mercury)
+
+
+
+        val planets = listOf(Planet(Body.Moon, "moon"),
+                             Planet(Body.Jupiter, "jupiter"),
+                             Planet(Body.Saturn, "saturn"),
+                             Planet(Body.Venus, "venus"),
+                             Planet(Body.Mars, "mars"),
+                             Planet(Body.Neptune, "neptune"),
+                             Planet(Body.Uranus, "uranus"),
+                             Planet(Body.Mercury, "mercury"))
 
         activity = requireActivity()
 
@@ -40,23 +49,23 @@ class PlanetFragment : Fragment() {
         binding.planetRecyclerView.adapter = planetAdapter
 
         planetAdapter.setOnItemClickListener(object: PlanetAdapter.OnItemClickListener {
-            override fun onItemClick(planet: Body) {selectPlanet(planet)}
+            override fun onItemClick(planet: Planet) {selectPlanet(planet)}
         })
     }
 
-    private fun selectPlanet(body:Body) {
-        if (SharedTrackingUtility.bodyUnderHorizon(body)) {
+    private fun selectPlanet(planet:Planet) {
+        if (SharedTrackingUtility.bodyUnderHorizon(planet.body)) {
             Toast.makeText(requireActivity(), "Not Visible", Toast.LENGTH_SHORT).show()
         } else {
             val resultIntent = Intent()
             val activity = requireActivity()
             Toast.makeText(
                 requireActivity(),
-                String.format("Tracking %s", body.name),
+                String.format("Tracking %s", planet.body.name),
                 Toast.LENGTH_SHORT
             ).show()
-            resultIntent.putExtra("Body", body)
-            resultIntent.putExtra("BodyName", body.name)
+            resultIntent.putExtra("Body", planet.body)
+            resultIntent.putExtra("BodyName", planet.body.name)
             activity.setResult(Activity.RESULT_OK, resultIntent)
             activity.finish()
         }
