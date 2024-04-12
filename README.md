@@ -19,7 +19,7 @@ An Arduino-based GoTo telescope mount controlled with a mobile application via B
 ### Mount Side View
 <img src="https://github.com/JamesClarke01/EasyScope/blob/master/Images/MountSideView.jpg" width="30%">
 
-### Adafruit Motor Shield 
+### Adafruit Motor Shield Component Connections
 <img src="https://github.com/JamesClarke01/EasyScope/blob/master/Images/AdashieldHighlightCrop.jpg" width="30%">
 
 
