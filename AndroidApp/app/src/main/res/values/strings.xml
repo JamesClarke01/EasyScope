@@ -1,6 +1,6 @@
 <resources>
     <!--Overall-->
-    <string name="app_name">Easy Scope</string>
+    <string name="app_name">Easy-Scope</string>
 
     <!--ConnectActivity-->
     <string name="connectScreenText">Select a device below to connect</string>

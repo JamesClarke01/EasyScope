@@ -5,17 +5,20 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import io.github.cosinekitty.astronomy.Body
 
-class PlanetAdapter(private val context: Context, private val planets: List<Body>) : RecyclerView.Adapter<PlanetAdapter.PlanetViewHolder>(){
+class PlanetAdapter(private val context: Context, private val planets: List<Planet>) : RecyclerView.Adapter<PlanetAdapter.PlanetViewHolder>(){
 
     private var onItemClickListener: PlanetAdapter.OnItemClickListener? = null
 
     class PlanetViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val txtPlanetName: TextView = itemView.findViewById(R.id.txtStarName)
+        val planetImage: ImageView = itemView.findViewById(R.id.objectImage)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlanetViewHolder {
@@ -26,9 +29,15 @@ class PlanetAdapter(private val context: Context, private val planets: List<Body
     override fun onBindViewHolder(holder: PlanetViewHolder, position: Int) {
         val planet = planets[position]
 
-        holder.txtPlanetName.text = planet.name
+        holder.txtPlanetName.text = planet.body.name
 
-        if(SharedTrackingUtility.bodyUnderHorizon(planet)) {
+        val resourceId = context.resources.getIdentifier(planet.imageName, "drawable",context.packageName)
+        val drawable = AppCompatResources.getDrawable(context, resourceId)
+
+        holder.planetImage.setImageDrawable(drawable)
+
+
+        if(SharedTrackingUtility.bodyUnderHorizon(planet.body)) {
             holder.txtPlanetName.setTextColor(Color.GRAY)
         } else {
             holder.txtPlanetName.setTextColor(ContextCompat.getColor(context, R.color.foreground))
@@ -42,14 +51,14 @@ class PlanetAdapter(private val context: Context, private val planets: List<Body
     override fun getItemCount(): Int = planets.size
 
     interface OnItemClickListener {
-        fun onItemClick(planet:Body)
+        fun onItemClick(planet:Planet)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         this.onItemClickListener = listener
     }
 
-    private fun onItemClick(planet:Body) {
+    private fun onItemClick(planet:Planet) {
         onItemClickListener?.onItemClick(planet)
     }
 }

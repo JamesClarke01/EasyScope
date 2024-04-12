@@ -151,7 +151,7 @@ String jsonString;
 int curlyCount = 0;
 
 //Function Headers
-int handleManualChar(char input);
+int handleSingleByte(char input);
 int handleCoordChar(char input);
 
 void setup()
@@ -182,17 +182,17 @@ void loop()
 
     switch (receiveMode) {      
       case MANUAL:
-        handleManualChar(rChar);
+        handleSingleByte(rChar);
         break;
       case JSON:
-        handleJsonChar(rChar);
+        handleJsonByte(rChar);
         break;      
     }    
   }
   return 0;
 }
 
-int handleJsonChar(char rChar) {
+int handleJsonByte(char rChar) {
   //Receiving JSON String
   
   jsonString += rChar;
@@ -208,7 +208,7 @@ int handleJsonChar(char rChar) {
   }
 }
 
-int handleManualChar(char rChar) {
+int handleSingleByte(char rChar) {
   switch (rChar) {
     case 'r':  //Move Right
       direction.manualAzIncrease();

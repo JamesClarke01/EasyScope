@@ -1,14 +1,11 @@
 package com.james.telescopeapp
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -16,9 +13,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import io.github.cosinekitty.astronomy.Body
 import java.util.Timer
 import java.util.TimerTask
@@ -78,12 +76,16 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSlew).setOnClickListener{openObjectSelect()}
         findViewById<Button>(R.id.btnCalibrate).setOnClickListener{closeActivity()}
 
-        findViewById<Button>(R.id.btnRight).setOnTouchListener(RepeatListener('r'))
-        findViewById<Button>(R.id.btnLeft).setOnTouchListener(RepeatListener('l'))
-        findViewById<Button>(R.id.btnUp).setOnTouchListener(RepeatListener('u'))
-        findViewById<Button>(R.id.btnDown).setOnTouchListener(RepeatListener('d'))
+        findViewById<ImageButton>(R.id.btnRight).setOnTouchListener(RepeatListener('r'))
+        findViewById<ImageButton>(R.id.btnLeft).setOnTouchListener(RepeatListener('l'))
+        findViewById<ImageButton>(R.id.btnUp).setOnTouchListener(RepeatListener('u'))
+        findViewById<ImageButton>(R.id.btnDown).setOnTouchListener(RepeatListener('d'))
 
         trackTimer = Timer()
+    }
+
+    private fun btnEvent() {
+        Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show()
     }
 
     private fun startTrack(pBody: Body) {
