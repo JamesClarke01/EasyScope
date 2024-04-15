@@ -84,6 +84,44 @@ class MainActivity : AppCompatActivity() {
         trackTimer = Timer()
     }
 
+    private fun disableManual() {
+        val btnUp = findViewById<ImageButton>(R.id.btnUp)
+        val btnRight = findViewById<ImageButton>(R.id.btnRight)
+        val btnLeft = findViewById<ImageButton>(R.id.btnLeft)
+        val btnDown = findViewById<ImageButton>(R.id.btnDown)
+
+        btnUp.setImageResource(R.drawable.manual_btn_grey)
+        btnUp.setOnTouchListener(null)
+
+        btnRight.setImageResource(R.drawable.manual_btn_grey)
+        btnRight.setOnTouchListener(null)
+
+        btnLeft.setImageResource(R.drawable.manual_btn_grey)
+        btnLeft.setOnTouchListener(null)
+
+        btnDown.setImageResource(R.drawable.manual_btn_grey)
+        btnDown.setOnTouchListener(null)
+    }
+
+    private fun enableManual() {
+        val btnUp = findViewById<ImageButton>(R.id.btnUp)
+        val btnRight = findViewById<ImageButton>(R.id.btnRight)
+        val btnLeft = findViewById<ImageButton>(R.id.btnLeft)
+        val btnDown = findViewById<ImageButton>(R.id.btnDown)
+
+        btnUp.setImageResource(R.drawable.manual_btn)
+        btnUp.setOnTouchListener(RepeatListener('u'))
+
+        btnRight.setImageResource(R.drawable.manual_btn)
+        btnRight.setOnTouchListener(RepeatListener('r'))
+
+        btnLeft.setImageResource(R.drawable.manual_btn)
+        btnLeft.setOnTouchListener(RepeatListener('l'))
+
+        btnDown.setImageResource(R.drawable.manual_btn)
+        btnDown.setOnTouchListener(RepeatListener('d'))
+    }
+
     private fun btnEvent() {
         Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show()
     }
@@ -106,8 +144,10 @@ class MainActivity : AppCompatActivity() {
             val body = data?.getSerializableExtra("Body") as Body
             val bodyName = data?.getSerializableExtra("BodyName")
             findViewById<Button>(R.id.btnSlew).text = String.format("Tracking: %s", bodyName)
+            disableManual()
             startTrack(body)
         } else if (result.resultCode == Activity.RESULT_CANCELED) {
+            enableManual()
             timerTrackTask?.cancel()  //Cancel task if assigned
             bluetoothService.sendReset() //Reset scope motors
             findViewById<Button>(R.id.btnSlew).text = getString(R.string.btnSlew)  //Reset text to default

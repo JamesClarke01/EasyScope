@@ -40,7 +40,7 @@ object SharedTrackingUtility {
             val currTime = Calendar.getInstance()
 
             val time = Time(
-                currTime.get(Calendar.YEAR), currTime.get(Calendar.MONTH),
+                currTime.get(Calendar.YEAR), currTime.get(Calendar.MONTH)+1,
                 currTime.get(Calendar.DATE), currTime.get(Calendar.HOUR_OF_DAY),
                 currTime.get(Calendar.MINUTE), currTime.get(Calendar.SECOND).toDouble()
             )
