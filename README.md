@@ -1,7 +1,7 @@
 # EasyScope
 An Arduino-based GoTo telescope mount controlled with a mobile application via Bluetooth.
 
-For a detailed overview please read my (thesis)[Thesis.pdf].
+For a detailed overview please read my [thesis](Thesis.pdf).
 
 # Telescope Mount
 ## Components
